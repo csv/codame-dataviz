@@ -39,7 +39,9 @@ New York bridges from monthly data. We use some sort of nice
 smoothing function so we get clean interpolations. Kernel
 density should be fine.
 
-Then we map
+Then we map predictions to frequencies. In the above example,
+we only have one instrument, but we can have more instruments
+for different dependent variables.
 
 ### Open data portal usage analytics
 http://thomaslevine.com/!/socrata-metrics-api/
