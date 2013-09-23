@@ -34,12 +34,12 @@ whatever. We can hand that out to the audience
 Fit a model to some sparse and small dataset. Map the model
 predictions to notes.
 
-For example, we predict
-[how many public meetings Missouri is holding](http://thomaslevine.com/!/socrata-calendars/)
-by week. We have different instruments depending on the lengths of
-the meetings.
+For example, we predict average daily bicycle ridership on
+New York bridges from monthly data. We use some sort of nice
+smoothing function so we get clean interpolations. Kernel
+density should be fine.
 
-We interpolate
+Then we map
 
 ### Open data portal usage analytics
 http://thomaslevine.com/!/socrata-metrics-api/
