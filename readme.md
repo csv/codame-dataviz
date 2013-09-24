@@ -13,6 +13,7 @@ To do
 2. CSV shirts, with `,`, `\r`, and `\n` (Let's make a store, too!)
 3. Big light-up comma
 4. More songs (below)
+5. Collecting bike accident data for an SF-related dataset. Almost done geocoding. Presentation could be similar to sqf-symphony or separate. [Info on what variables we have](https://www.baycitizen.org/data/bikes/bike-accident-tracker/). 
 
 ## Data-driven dance
 
