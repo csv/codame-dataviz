@@ -16,6 +16,11 @@ To do
 
 ## Data-driven dance
 
+In the part of `fms` when the debt ceiling is about to rise and the drums drop out, have everyone in the crowd yell 
+"RAISE THE ROOF" and do this move:
+
+![raise-the-roof](http://gifrific.com/wp-content/uploads/2013/05/Michael-Scott-and-Dwight-Schrute-Raise-the-Roof.gif)
+
 ## General inspirations
 
 ### Bring things in parts at a time
