@@ -13,8 +13,14 @@ To do
 2. CSV shirts, with `,`, `\r`, and `\n` (Let's make a store, too!)
 3. Big light-up comma
 4. More songs (below)
+5. Collecting bike accident data for an SF-related dataset. Almost done geocoding. Presentation could be similar to sqf-symphony or separate. [Info on what variables we have](https://www.baycitizen.org/data/bikes/bike-accident-tracker/). 
 
 ## Data-driven dance
+
+In the part of `fms` when the debt ceiling is about to rise and the drums drop out, have everyone in the crowd yell 
+"RAISE THE ROOF" and do this move:
+
+![raise-the-roof](http://gifrific.com/wp-content/uploads/2013/05/Michael-Scott-and-Dwight-Schrute-Raise-the-Roof.gif)
 
 ## General inspirations
 
