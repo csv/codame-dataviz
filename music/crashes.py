@@ -7,6 +7,18 @@ from operator import itemgetter
 crashes = json.load(open('data/hex_running_totals.min.json'))
 attr = json.load(open('data/case-lookup-table.min.json'))
 
+# make a data.frame
+data = []
+for day in crashes.values():
+    for crash in day:
+        row = dict(
+            crash.items() + 
+            attr[crash['case_id']].items()
+            )
+        data.append(row)
+
+df = pd.DataFrame(data)
+df.to_csv('data/crashses.csv')
 
 # count by hex_id
 hex_counts = {}
@@ -65,81 +77,96 @@ t = 0
 
 
 for d in date_range:
-    day = d.strftime('%Y-%m-%d'
+    day = d.strftime('%Y-%m-%d')
     if crashes.has_key(day):
         for crash in crashes[day]:
-            note = hex_to_note(crash['hex_id'])
-            print note
+            key = hex_to_key[crash['hex_id']]
+            print key
             midi_track.addNote(
                 track=0, 
                 channel=0,
-                pitch=note,
+                pitch=key,
                 duration=beat, 
                 volume=100, 
                 time=t
             )
+    t += beat
 
-            t += beat
-    else:
-        t += beat
-
-binfile = open('crashes.mid', 'wb')  
+binfile = open('midi/crash-arp.mid', 'wb')  
 midi_track.writeFile(binfile)
 binfile.close()
 
+#  __  __  ___  _   _ _____ _   _   __  __ _____ _     ___  ______   __
+# |  \/  |/ _ \| \ | |_   _| | | | |  \/  | ____| |   / _ \|  _ \ \ / /
+# | |\/| | | | |  \| | | | | |_| | | |\/| |  _| | |  | | | | | | \ V / 
+# | |  | | |_| | |\  | | | |  _  | | |  | | |___| |__| |_| | |_| || |  
+# |_|  |_|\___/|_| \_| |_| |_| |_| |_|  |_|_____|_____\___/|____/ |_|  
+                                                                     
+months = pd.read_csv('data/month_counts.csv')
 
-# df = pd.read_csv('data/bike_data_hexed.csv')
-# df.simpledate = df.simpledate.apply(lambda x: datetime.strptime(str(x), "%Y%m%d"))
+# ceiling
+vec = months.month_count
+out_file="months.mid"
+bpm=120
+key="A"
+scale=[0,3,5,7,10]
+count='1/4' 
+channel=1
+min_note="A2"
+max_note="A5"
 
-# hex_to_note = {
-#     'h1': "C3",
-#     'h10' : "B4",
-#     'h11': "C5",
-#     'h2': "E3",
-#     'h3': "G3",
-#     'h4': "A3",
-#     'h44': "G5",
-#     'h5': "B4",
-#     'h6' : "C4",
-#     'h7' : "E4",
-#     'h8' : "G4",
-#     'h9' : "A4"
-#  }
+# transform keys and min/max notes
+key = root_to_midi(key)
+min_note = note_to_midi(min_note)
+max_note = note_to_midi(max_note)
 
-# bpm = 120
-# midi_track = MIDIFile(1)
-# midi_track.addTempo(track=0, time=0,tempo=bpm)
+# select notes
+notes = build_scale(key, scale, min_note, max_note)
 
-# beat = bpm_time(bpm, count='1/2')
-# t = 0
+# scale notes
+# hack to ensure 
+note_indexes = scale_vec(vec, low=0, high=(len(notes)-1))
 
-# for d in date_range:
-#     this_df = sf[sf.simpledate==d]
-#     if len(this_df)!=0:
-#         for i in this_df.index:
-#             if this_df.fatal[i]==1:
-#                 volume = 120
-#             else:
-#                 volume = 60
-#             try:
-#                 note = hex_to_note[this_df.hex_id.values[0]]
-#             except:
-#                 t += beat
-#             else:
-#                 midi_track.addNote(
-#                     track=0, 
-#                     channel=0,
-#                     pitch=note_to_midi(note),
-#                     duration=beat, 
-#                     volume=volume, 
-#                     time=t
-#                 )
+# determinte note length
+beat = bpm_time(bpm, count)
 
-#                 t += beat
-#     else:
+# generate midi file
+midi_track = MIDIFile(1)
+midi_track.addTempo(track=0, time=0,tempo=bpm)
 
-#         t += beat
+t = 0
+for i in note_indexes:
+    n = notes[i]
+    midi_track.addNote(track=0, channel=0, pitch=n, time=t, duration=beat, volume=100)
+    t += beat
 
-# binfile = open('crashes.mid', 'wb')  
-# midi_track.writeFile(binfile)
-# binfile.close()
+binfile = open(out_file, 'wb')
+midi_track.writeFile(binfile)
+binfile.close()
+
+bpm = 120
+midi_track = MIDIFile(1)
+midi_track.addTempo(track=0, time=0,tempo=bpm)
+
+beat = bpm_time(bpm, count='1/4')
+t = 0
+
+for d in date_range:
+    day = d.strftime('%Y-%m-%d')
+    if crashes.has_key(day):
+        for crash in crashes[day]:
+            key = hex_to_key[crash['hex_id']]
+            print key
+            midi_track.addNote(
+                track=0, 
+                channel=0,
+                pitch=key,
+                duration=beat, 
+                volume=100, 
+                time=t
+            )
+    t += beat
+
+binfile = open('midi/crash-months.mid', 'wb')  
+midi_track.writeFile(binfile)
+binfile.close()

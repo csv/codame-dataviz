@@ -3,3 +3,4 @@ ableton/
 */.DS_Store
 */.Rhistory
 .Rhistory
+*/*.pyc

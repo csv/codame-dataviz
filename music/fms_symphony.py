@@ -7,7 +7,7 @@ df = pd.read_csv('data/fms.csv')
 # rate
 midify(
     df.rate, 
-    out_file="rate.mid",
+    out_file="midi/fms-rate.mid",
     bpm=160,
     key="C",
     scale=MAJOR, 
@@ -20,7 +20,7 @@ midify(
 # ceiling
 midify(
     df.dist_to_ceiling, 
-    out_file="ceiling.mid",
+    out_file="midi/fms-ceiling.mid",
     bpm=160,
     key="C",
     scale=MAJOR, 
@@ -86,6 +86,6 @@ for z in df.z_change:
     # increase time
     t += beat
 
-binfile = open('chords.mid', 'wb')  
+binfile = open('midi/fms-chords.mid', 'wb')  
 midi_track.writeFile(binfile)
 binfile.close()
