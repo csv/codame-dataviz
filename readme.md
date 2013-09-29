@@ -66,6 +66,7 @@ Silver
 * https://finances.worldbank.org/Procurement/Major-Contract-Awards/kdui-wcs3
 * https://data.consumerfinance.gov/Government/Survey-of-Credit-Card-Plans/gme7-gkkr?
 * http://www.usmint.gov/about_the_mint/index.cfm?action=PreciousMetals&type=bullion
+* stock market or silver prices from yahoo
 
 Towing
 
