@@ -50,6 +50,7 @@ we only have one instrument, but we can have more instruments
 for different dependent variables.
 
 ### Open data portal usage analytics
+These data are a mess and are very random, so I don't think they'll be that interesting.
 http://thomaslevine.com/!/socrata-metrics-api/
 
 ## Datasets
