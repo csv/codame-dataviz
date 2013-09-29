@@ -34,8 +34,8 @@ def scale_vec(vec, low, high):
   vec = [int(ceil(v*1e5)) for v in vec]
 
   # extract min and max info
-  min_vec = min(vec) + abs(min(vec))
-  max_vec = max(vec) + abs(min(vec))
+  min_vec = min(vec)
+  max_vec = max(vec)
 
   # scale
   return [(int(ceil(v - min_vec)) * (high-low) / (max_vec - min_vec)) for v in vec]
