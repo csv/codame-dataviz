@@ -14,5 +14,7 @@ if (!('gdp' %in% ls())) {
   gdp$Subject.Descriptor <- NULL # GDP
   gdp$Estimates.Start.After <- NULL
   gdp$Country.Series.specific.Notes <- NULL
+  gdp$Units <- NULL # USD
+  gdp$GDP <- as.numeric(gdp$GDP) * 1e9
   gdp$Year <- as.numeric(sub('^X', '', as.character(gdp$Year)))
 }
