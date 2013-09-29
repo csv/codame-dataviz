@@ -1,23 +1,22 @@
 library(plyr)
 library(aplpack)
 library(reshape2)
-library(RJSONIO)
+library(rjson)
 library(sqldf)
+library(plyr)
+setwd('~/Dropbox/code/codame-dataviz/has-beens/fms-symphony/video')
 
-# Load the data
-if (!'table2.raw' %in% ls()) {
-    table2.raw <- read.csv('../data/table2-std.csv')
+table2.raw <- read.csv('../data/table2-std.csv')
 
-    # Fix types
-    table2.raw$date <- as.Date(table2.raw$date)
-    table2.raw$type <- factor(table2.raw$type)
-    table2.raw$item <- factor(table2.raw$item)
-    table2.raw$today <- as.numeric(table2.raw$today)
+# Fix types
+table2.raw$date <- as.Date(table2.raw$date)
+table2.raw$type <- factor(table2.raw$type)
+table2.raw$item <- factor(table2.raw$item)
+table2.raw$today <- as.numeric(table2.raw$today)
 
-    source('data.r')
-    fed.rate <- read.csv('../data/fed_rate.csv', stringsAsFactors = F)
-    fed.rate$date <- strptime(fed.rate$date, format = '%m/%d/%y')
-}
+source('data.r')
+fed.rate <- read.csv('../data/fed_rate.csv', stringsAsFactors = F)
+fed.rate$date <- strptime(fed.rate$date, format = '%m/%d/%y')
 
 # Write some data for the website, skipping the top 40 for rolling
 links <- sqldf('select date, url from [table2.raw] group by date')[-(1:40),]
@@ -112,7 +111,7 @@ frame <- function(i) {
         table2.toplot[1:i,'balance'] ~ table2.toplot[1:i,'date'],
         type = 'n',
         xlim = range(table2.toplot$date),
-        ylim = c(-2e5, 7e5), #range(table2.toplot$balance),
+        ylim = range(table2.toplot$balance),
         xlab = '', #Date
         ylab = 'Cash in the bank (billions)', main = '', #'FMS Soundsystem',
         axes = F, col = 4 # so we notice errors
@@ -206,12 +205,15 @@ frame <- function(i) {
     axis(4, at = 0:5, labels = paste(0:5, '%', sep = ''), lty = 2, col = fg, col.ticks = fg)
 }
 
-# frame(30)
+frame(30)
 
 main.plots <- function() {
     for (i in 1:nrow(table2.toplot)) {
-         png(sprintf('slideshow/%d.png', i), width = 1200, height = 600) 
+         fp = sprintf('slideshow/%d.png', i)
+         cat(sprintf("writng %s to file\n", fp))
+         png(fp, width = 1200, height = 600) 
          frame(i)
          dev.off()
     }
 }
+main.plots()
