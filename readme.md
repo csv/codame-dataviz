@@ -59,3 +59,15 @@ http://thomaslevine.com/!/socrata-metrics-api/
 * Nursing homes
 * American Community Survey
 * https://data.energystar.gov/
+
+Silver
+
+* http://datahub.io/dataset/goldsilverminesenergyuseghgemissions
+* https://finances.worldbank.org/Procurement/Major-Contract-Awards/kdui-wcs3
+* https://data.consumerfinance.gov/Government/Survey-of-Credit-Card-Plans/gme7-gkkr?
+* http://www.usmint.gov/about_the_mint/index.cfm?action=PreciousMetals&type=bullion
+
+Towing
+
+* https://data.cityofchicago.org/Transportation/Towed-Vehicles/ygr5-vcbg?
+* https://data.baltimorecity.gov/Transportation/DOT-Towing/k78j-azhn?
