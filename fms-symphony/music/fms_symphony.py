@@ -2,7 +2,7 @@ from midify import *
 import pandas as pd
 from midiutil.MidiFile import MIDIFile
 
-df = pd.read_csv('data/fms.csv')
+df = pd.read_csv('../data/fms.csv')
 
 # rate
 midify(
@@ -19,7 +19,7 @@ midify(
 
 # ceiling
 midify(
-    df.dist_to_ceiling, 
+    df.dist_to_ceiling *-1, 
     out_file="midi/fms-ceiling.mid",
     bpm=160,
     key="C",
@@ -31,7 +31,7 @@ midify(
   )
 
 # chords
-bpm = 160
+bpm = 120
 midi_track = MIDIFile(1)
 midi_track.addTempo(track=0, time=0,tempo=bpm)
 
@@ -87,5 +87,40 @@ for z in df.z_change:
     t += beat
 
 binfile = open('midi/fms-chords.mid', 'wb')  
+midi_track.writeFile(binfile)
+binfile.close()
+
+# flourishes
+bpm = 160
+midi_track = MIDIFile(2)
+midi_track.addTempo(track=0, time=0,tempo=bpm)
+
+beat = bpm_time(bpm, count='1/4')
+t = 0
+for z in df.z_change:
+
+    # add chords based on z-change
+    if z <= -2.5:
+        midi_track.addNote(
+            track=0, 
+            channel=0,
+            pitch="A2",
+            duration=beat, 
+            volume=100, 
+            time=t
+        )
+    elif z >= 3:
+        midi_track.addNote(
+            track=1, 
+            channel=0,
+            pitch="C2",
+            duration=beat, 
+            volume=100, 
+            time=t
+        )
+    # increase time
+    t += beat
+
+binfile = open('midi/fms-flourishes.mid', 'wb')  
 midi_track.writeFile(binfile)
 binfile.close()

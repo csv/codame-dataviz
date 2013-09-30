@@ -4,8 +4,8 @@ from midiutil.MidiFile import MIDIFile
 from datetime import datetime, timedelta
 from operator import itemgetter
 
-crashes = json.load(open('data/hex_running_totals.min.json'))
-attr = json.load(open('data/case-lookup-table.min.json'))
+crashes = json.load(open('../data/hex_running_totals.min.json'))
+attr = json.load(open('../data/case-lookup-table.min.json'))
 
 # make a data.frame
 data = []
@@ -102,7 +102,7 @@ binfile.close()
 # | |  | | |_| | |\  | | | |  _  | | |  | | |___| |__| |_| | |_| || |  
 # |_|  |_|\___/|_| \_| |_| |_| |_| |_|  |_|_____|_____\___/|____/ |_|  
                                                                      
-months = pd.read_csv('data/month_counts.csv')
+months = pd.read_csv('../data/month_counts.csv')
 
 # ceiling
 vec = months.month_count
