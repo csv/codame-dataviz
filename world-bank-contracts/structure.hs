@@ -5,14 +5,14 @@ type Stanza  = (Measure, Measure, Measure, Measure,
 type Song    = [Stanza]
 
 stanza :: Maybe Integer -> ()
-stanza = ()
+stanza year = ()
   -- First measure is aggregate
   -- Six measures, one per region, with one (random) country per region
   -- Last measure is the sum of the previous seven,
   --   maybe with some interesting close of the last measure
 
-main <- do
-  song   = [ stanza Nothing,
+main = do
+  song  <- [ stanza Nothing,
              stanza 2000,
              stanza 2000,
              stanza 2001,
@@ -41,6 +41,7 @@ main <- do
              stanza 2012,
              stanza 2013,
              stanza 2013 ]
-  nbeats = (length song) * 8 * 4
-  bpm    = 256
-  minutes= bpm / nbeats
+  nbeats <- (length song) * 8 * 4
+  let bpm = 256
+  let minutes= bpm / nbeats
+  minutes
