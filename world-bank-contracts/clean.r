@@ -1,4 +1,5 @@
 library(reshape2)
+library(ggplot2)
 library(plyr)
 
 if (!('a' %in% ls())) {
@@ -8,12 +9,14 @@ if (!('a' %in% ls())) {
 
   a$Country <- a$Borrower.Country
   a$Year <- a$Fiscal.Year
+
+  a$Total.Contract.Amount..USD. <- as.numeric(sub('^\\$', '', a$Total.Contract.Amount..USD.))
 }
 
 if (!('gdp' %in% ls())) {
   .gdp.wide <- read.csv('gdp.tsv', sep = '\t')
   .columns <- c('Country', 'Subject.Descriptor', 'Units', 'Scale', 'Country.Series.specific.Notes', 'Estimates.Start.After')
-  gdp <- melt(gdp.wide, .columns, variable.name = 'Year', value.name = 'GDP')
+  gdp <- melt(.gdp.wide, .columns, variable.name = 'Year', value.name = 'GDP')
   gdp$Scale <- NULL # billions
   gdp$Subject.Descriptor <- NULL # GDP
   gdp$Estimates.Start.After <- NULL
@@ -22,8 +25,11 @@ if (!('gdp' %in% ls())) {
   gdp$GDP <- as.numeric(gdp$GDP) * 1e9
   gdp$Year <- as.numeric(sub('^X', '', as.character(gdp$Year)))
 }
-a.agg <- ddply(a, c('Year', 'Country'), function(df) {
-  c(Count = nrow(df))
-})
 
-x <- join(na.omit(gdp), a.agg, by = c('Year', 'Country'))
+# x <- join(na.omit(gdp), a, by = c('Year', 'Country'))
+
+a.zambia <- subset(a, Country == 'Zambia')
+
+p <- ggplot(a.zambia) + aes(x = Contract.Signing.Date, y = Total.Contract.Amount..USD.) +
+  aes(color = Procurement.Method) +
+  geom_point()
