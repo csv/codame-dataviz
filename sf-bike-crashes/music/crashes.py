@@ -18,7 +18,7 @@ for day in crashes.values():
         data.append(row)
 
 df = pd.DataFrame(data)
-df.to_csv('data/crashses.csv')
+df.to_csv('../data/crashses.csv')
 
 # count by hex_id
 hex_counts = {}
@@ -106,7 +106,6 @@ months = pd.read_csv('../data/month_counts.csv')
 
 # ceiling
 vec = months.month_count
-out_file="months.mid"
 bpm=120
 key="A"
 scale=[0,3,5,7,10]
@@ -138,33 +137,6 @@ t = 0
 for i in note_indexes:
     n = notes[i]
     midi_track.addNote(track=0, channel=0, pitch=n, time=t, duration=beat, volume=100)
-    t += beat
-
-binfile = open(out_file, 'wb')
-midi_track.writeFile(binfile)
-binfile.close()
-
-bpm = 120
-midi_track = MIDIFile(1)
-midi_track.addTempo(track=0, time=0,tempo=bpm)
-
-beat = bpm_time(bpm, count='1/4')
-t = 0
-
-for d in date_range:
-    day = d.strftime('%Y-%m-%d')
-    if crashes.has_key(day):
-        for crash in crashes[day]:
-            key = hex_to_key[crash['hex_id']]
-            print key
-            midi_track.addNote(
-                track=0, 
-                channel=0,
-                pitch=key,
-                duration=beat, 
-                volume=100, 
-                time=t
-            )
     t += beat
 
 binfile = open('midi/crash-months.mid', 'wb')  
