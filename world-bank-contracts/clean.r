@@ -27,10 +27,10 @@ if (!('gdp' %in% ls())) {
   gdp$Year <- as.numeric(sub('^X', '', as.character(gdp$Year)))
 }
 
-x <- join(na.omit(gdp), a, by = c('Year', 'Country'))
+# x <- join(na.omit(gdp), a, by = c('Year', 'Country'))
 
 # Each verse is a country
-a.zambia <- subset(a, Country == 'Zambia')
+# a.zambia <- subset(a, Country == 'Zambia')
 
 p1 <- ggplot(a.zambia) + aes(x = Contract.Signing.Date, y = Total.Contract.Amount..USD.) +
   aes(color = Supplier.Country == 'Zambia') +
@@ -53,3 +53,17 @@ p3 <- ggplot(x) + aes(x = GDP, y = Total.Contract.Amount..USD.) +
   scale_y_log10('Contract amount (USD)', labels = dollar) +
   facet_wrap(~ Procurement.Category) +
   geom_point(alpha = 0.3)
+
+# sort(table(a$Supplier), decreasing = T)[1:20]
+a$Supplier.Reduced <- a$Supplier
+a$Supplier.Reduced[grepl('UNITED NATIONS', a$Supplier.Reduced)] <- 'UNITED NATIONS'
+a$Supplier.Reduced[a$Supplier.Reduced == 'ERNST & YOUNG'] <- 'BIG 4'
+a$Supplier.Reduced[a$Supplier.Reduced == 'DELOITTE & TOUCHE'] <- 'BIG 4'
+a$Supplier.Reduced[a$Supplier.Reduced == 'KPMG'] <- 'BIG 4'
+a$Supplier.Reduced[a$Supplier.Reduced == 'PRICEWATERHOUSECOOPERS'] <- 'BIG 4'
+a$Supplier.Reduced[a$Supplier.Reduced == 'PRICE WATERHOUSE COOPERS'] <- 'BIG 4'
+
+# a$Supplier.Reduced[a$Supplier.Reduced] <-
+print(sort(table(a$Supplier.Reduced), decreasing = T)[1:10])
+print(sort(table(a[a$Supplier.Country == a$Borrower.Country]$Supplier.Reduced), decreasing = T)[1:10])
+print(sort(table(a[a$Supplier.Country != a$Borrower.Country]$Supplier.Reduced), decreasing = T)[1:10])
