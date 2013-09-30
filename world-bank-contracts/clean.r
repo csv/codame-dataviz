@@ -65,5 +65,5 @@ a$Supplier.Reduced[a$Supplier.Reduced == 'PRICE WATERHOUSE COOPERS'] <- 'BIG 4'
 
 # a$Supplier.Reduced[a$Supplier.Reduced] <-
 print(sort(table(a$Supplier.Reduced), decreasing = T)[1:10])
-print(sort(table(a[a$Supplier.Country == a$Borrower.Country]$Supplier.Reduced), decreasing = T)[1:10])
-print(sort(table(a[a$Supplier.Country != a$Borrower.Country]$Supplier.Reduced), decreasing = T)[1:10])
+print(sort(table(a$Supplier.Reduced[a$Supplier.Country == a$Borrower.Country]), decreasing = T)[1:10])
+print(sort(table(a$Supplier.Reduced[a$Supplier.Country != a$Borrower.Country]), decreasing = T)[1:10])
