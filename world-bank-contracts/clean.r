@@ -1,5 +1,6 @@
 library(reshape2)
 library(ggplot2)
+library(scales)
 library(plyr)
 
 if (!('a' %in% ls())) {
@@ -31,5 +32,7 @@ if (!('gdp' %in% ls())) {
 a.zambia <- subset(a, Country == 'Zambia')
 
 p <- ggplot(a.zambia) + aes(x = Contract.Signing.Date, y = Total.Contract.Amount..USD.) +
-  aes(color = Procurement.Method) +
+  aes(color = Supplier.Country == 'Zambia') +
+  facet_wrap(~Procurement.Method) +
+  scale_y_log10('Contract amount (USD)', labels = dollar) +
   geom_point()
