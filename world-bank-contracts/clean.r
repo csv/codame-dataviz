@@ -27,12 +27,29 @@ if (!('gdp' %in% ls())) {
   gdp$Year <- as.numeric(sub('^X', '', as.character(gdp$Year)))
 }
 
-# x <- join(na.omit(gdp), a, by = c('Year', 'Country'))
+x <- join(na.omit(gdp), a, by = c('Year', 'Country'))
 
+# Each verse is a country
 a.zambia <- subset(a, Country == 'Zambia')
 
-p <- ggplot(a.zambia) + aes(x = Contract.Signing.Date, y = Total.Contract.Amount..USD.) +
+p1 <- ggplot(a.zambia) + aes(x = Contract.Signing.Date, y = Total.Contract.Amount..USD.) +
   aes(color = Supplier.Country == 'Zambia') +
   facet_wrap(~Procurement.Method) +
   scale_y_log10('Contract amount (USD)', labels = dollar) +
   geom_point()
+
+p2 <- ggplot(a) + aes(x = Procurement.Category) + facet_wrap(~ Country) + geom_bar()
+
+# ddply(a, 'Country', function(df) {
+#   c(
+#     Domestic.Supplier = mean(df$Supplier.Country == df$Country),
+#     Consultant.Sernices = mean(df$Procurement.Category == 'Consultant Services')
+#   )
+# }
+
+p3 <- ggplot(x) + aes(x = GDP, y = Total.Contract.Amount..USD.) +
+  aes(color = Procurement.Category) +
+  scale_x_log10('GDP (USD)', labels = dollar) +
+  scale_y_log10('Contract amount (USD)', labels = dollar) +
+  facet_wrap(~ Procurement.Category) +
+  geom_point(alpha = 0.3)
