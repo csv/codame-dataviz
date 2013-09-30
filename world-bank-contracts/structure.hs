@@ -6,6 +6,10 @@ type Song    = [Stanza]
 
 stanza :: Maybe Integer -> ()
 stanza = ()
+  -- First measure is aggregate
+  -- Six measures, one per region, with one (random) country per region
+  -- Last measure is the sum of the previous seven,
+  --   maybe with some interesting close of the last measure
 
 main <- do
   song   = [ stanza Nothing,
