@@ -87,7 +87,7 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
   region.drones <- list(
     # Scale each drone to an eight-beat-long note.
     drone1 = this.region.gdp,
-    drone2 = this.region.population,
+    drone2 = this.region.population
   )
 
   if (country == '') {
