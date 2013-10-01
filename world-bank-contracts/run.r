@@ -76,7 +76,9 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
   region.records <- data.frame(
     Country = unique(contracts$Borrower.Country[contracts$Region == region]),
     Year = year)
-  join(region.records, gdp)
+  region.stats <- join(join(region.records, gdp), population)
+  this.region.gdp <- sum(region.stats$GDP)
+  this.region.population <- sum(region.stats$Population)
 
   if (country == '') {
     # No country, just the region
@@ -85,16 +87,19 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
   } else {
     # One country in the region
     # this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
-    this.gdp <- subset(gdp, Country == country & Year == year[1,'GDP'])
+    this.gdp <- subset(gdp, Country == country & Year == year)[1,'GDP']
     this.population <- subset(population, Country == country & Year == year)[1,'Population']
   }
 
   list(
     # Scale each drone to an eight-beat-long note.
-    drone1 = this.gdp,
-    drone2 = this.population
+    drone1 = this.region.gdp,
+    drone2 = this.region.population,
+
+    drone3 = this.gdp,
+    drone4 = this.population
   )
 }
 
 ddr_init(player="/usr/bin/env mplayer'")
-m <- phrase(contracts, gdp, population, 2003, 'ASIA', 'Bangladesh')
+m <- phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone')
