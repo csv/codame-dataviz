@@ -15,7 +15,8 @@ if (!('a' %in% ls())) {
 
   contracts$Total.Contract.Amount..USD. <- as.numeric(sub('^\\$', '', contracts$Total.Contract.Amount..USD.))
   contracts$Year.Week <- as.numeric(strftime(contracts$Contract.Signing.Date, format = '%W'))
-  contracts$Year.Eighth <- ceiling(contracts$Year.Week * 8 / 52)
+  contracts$Year.Eighth <- floor(contracts$Year.Week * 8 / 53)
+  contracts$Year.Eighth[contracts$Year.Eighth == 8] <- 7
 }
 
 if (!('gdp' %in% ls())) {
@@ -92,6 +93,10 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
     this.population <- subset(population, Country == country & Year == year)[1,'Population']
 
     this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
+
+    is.domestic <- this.contracts$Borrower.Country == this.contracts$Supplier.Country
+    domestic.contracts <- table(this.contracts[is.domestic,'Year.Eighth'])
+    foreign.contracts <- table(this.contracts[!is.domestic,'Year.Eighth'])
   }
 
   list(
@@ -100,7 +105,10 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
     drone2 = this.region.population,
 
     drone3 = this.gdp,
-    drone4 = this.population
+    drone4 = this.population,
+
+    melody1 = domestic.contracts,
+    melody2 = foreign.contracts
   )
 }
 
