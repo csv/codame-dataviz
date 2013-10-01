@@ -17,16 +17,7 @@ if (!('a' %in% ls())) {
 }
 
 if (!('gdp' %in% ls())) {
-  .gdp.wide <- read.csv('gdp.tsv', sep = '\t')
-  .columns <- c('Country', 'Subject.Descriptor', 'Units', 'Scale', 'Country.Series.specific.Notes', 'Estimates.Start.After')
-  gdp <- melt(.gdp.wide, .columns, variable.name = 'Year', value.name = 'GDP')
-  gdp$Scale <- NULL # billions
-  gdp$Subject.Descriptor <- NULL # GDP
-  gdp$Estimates.Start.After <- NULL
-  gdp$Country.Series.specific.Notes <- NULL
-  gdp$Units <- NULL # USD
-  gdp$GDP <- as.numeric(gdp$GDP) * 1e9
-  gdp$Year <- as.numeric(sub('^X', '', as.character(gdp$Year)))
+  .gdp.wide <- read.csv('gdp.csv')
 }
 
 if (!('population' %in% ls())) {
