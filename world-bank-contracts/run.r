@@ -79,6 +79,12 @@ eda <- function() {
 
 # Two measures, eight beats
 phrase <- function(contracts, gdp, population, year, region = NULL, country = NULL, play.melody = TRUE) {
+  if (!is.null(country) & is.null(region)){
+    region <- subset(contracts, Borrower.Country == country)[1,'Region']
+  } else if (is.null(country) & !is.null(region)){
+    country <- sample(subset(contracts, Region == region)$Borrower.Country, 1)
+  }
+
   if (is.null(country) & is.null(region)) {
     # All the countries that year
     this.gdp <- sum(gdp[gdp$Year == year,'GDP'])
@@ -124,11 +130,20 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
   }
 }
 
+# Song: 16 Stanzas
 song <- list(
+  # Stanza: 8 Phrases
   y2003 = list(
+    # Phrase: 2 measures (8 beats)
     intro      = phrase(contracts, gdp, population, 2003, play.melody = FALSE),
     africa     = phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone', play.melody = TRUE),
     south.asia = phrase(contracts, gdp, population, 2003, 'SOUTH ASIA', 'Bangladesh'),
     out        = phrase(contracts, gdp, population, 2003, play.melody = TRUE)
+  ),
+  y2004 = list(
+    intro      = phrase(contracts, gdp, population, 2004, play.melody = FALSE),
+    africa     = phrase(contracts, gdp, population, 2004, 'AFRICA', play.melody = TRUE),
+    south.asia = phrase(contracts, gdp, population, 2004, 'SOUTH ASIA', play.melody = TRUE),
+    out        = phrase(contracts, gdp, population, 2004, play.melody = TRUE)
   )
 )
