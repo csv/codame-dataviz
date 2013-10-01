@@ -77,8 +77,8 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
     Country = unique(contracts$Borrower.Country[contracts$Region == region]),
     Year = year)
   region.stats <- join(join(region.records, gdp), population)
-  this.region.gdp <- sum(region.stats$GDP)
-  this.region.population <- sum(region.stats$Population)
+  this.region.gdp <- sum(region.stats$GDP, na.rm = TRUE)
+  this.region.population <- sum(region.stats$Population, na.rm = TRUE)
 
   if (country == '') {
     # No country, just the region
