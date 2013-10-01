@@ -7,13 +7,15 @@ library(ddr)
 
 if (!('a' %in% ls())) {
   a <- read.csv('major-contract-awards.csv', stringsAsFactors = FALSE)
-  a$As.of.Date <- strptime(a$As.of.Date, '%m/%d/%Y 12:00:00 AM')
-  a$Contract.Signing.Date <- strptime(a$Contract.Signing.Date, '%m/%d/%Y 12:00:00 AM')
+  contracts$As.of.Date <- strptime(contracts$As.of.Date, '%m/%d/%Y 12:00:00 AM')
+  contracts$Contract.Signing.Date <- strptime(contracts$Contract.Signing.Date, '%m/%d/%Y 12:00:00 AM')
 
-  a$Country <- a$Borrower.Country
-  a$Year <- a$Fiscal.Year
+  contracts$Country <- contracts$Borrower.Country
+  contracts$Year <- contracts$Fiscal.Year
 
-  a$Total.Contract.Amount..USD. <- as.numeric(sub('^\\$', '', a$Total.Contract.Amount..USD.))
+  contracts$Total.Contract.Amount..USD. <- as.numeric(sub('^\\$', '', contracts$Total.Contract.Amount..USD.))
+  contracts$Year.Week <- as.numeric(strftime(contracts$Contract.Signing.Date, format = '%W'))
+  contracts$Year.Eighth <- ceiling(contracts$Year.Week * 8 / 52)
 }
 
 if (!('gdp' %in% ls())) {
@@ -54,19 +56,19 @@ eda <- function() {
     facet_wrap(~ Procurement.Category) +
     geom_point(alpha = 0.3)
 
-  # sort(table(a$Supplier), decreasing = T)[1:20]
-  a$Supplier.Reduced <- a$Supplier
-  a$Supplier.Reduced[grepl('UNITED NATIONS', a$Supplier.Reduced)] <- 'UNITED NATIONS'
-  a$Supplier.Reduced[a$Supplier.Reduced == 'ERNST & YOUNG'] <- 'BIG 4'
-  a$Supplier.Reduced[a$Supplier.Reduced == 'DELOITTE & TOUCHE'] <- 'BIG 4'
-  a$Supplier.Reduced[a$Supplier.Reduced == 'KPMG'] <- 'BIG 4'
-  a$Supplier.Reduced[a$Supplier.Reduced == 'PRICEWATERHOUSECOOPERS'] <- 'BIG 4'
-  a$Supplier.Reduced[a$Supplier.Reduced == 'PRICE WATERHOUSE COOPERS'] <- 'BIG 4'
+  # sort(table(contracts$Supplier), decreasing = T)[1:20]
+  contracts$Supplier.Reduced <- contracts$Supplier
+  contracts$Supplier.Reduced[grepl('UNITED NATIONS', contracts$Supplier.Reduced)] <- 'UNITED NATIONS'
+  contracts$Supplier.Reduced[contracts$Supplier.Reduced == 'ERNST & YOUNG'] <- 'BIG 4'
+  contracts$Supplier.Reduced[contracts$Supplier.Reduced == 'DELOITTE & TOUCHE'] <- 'BIG 4'
+  contracts$Supplier.Reduced[contracts$Supplier.Reduced == 'KPMG'] <- 'BIG 4'
+  contracts$Supplier.Reduced[contracts$Supplier.Reduced == 'PRICEWATERHOUSECOOPERS'] <- 'BIG 4'
+  contracts$Supplier.Reduced[contracts$Supplier.Reduced == 'PRICE WATERHOUSE COOPERS'] <- 'BIG 4'
 
-  # a$Supplier.Reduced[a$Supplier.Reduced] <-
-  print(sort(table(a$Supplier.Reduced), decreasing = T)[1:10])
-  print(sort(table(a$Supplier.Reduced[a$Supplier.Country == a$Borrower.Country]), decreasing = T)[1:10])
-  print(sort(table(a$Supplier.Reduced[a$Supplier.Country != a$Borrower.Country]), decreasing = T)[1:10])
+  # contracts$Supplier.Reduced[contracts$Supplier.Reduced] <-
+  print(sort(table(contracts$Supplier.Reduced), decreasing = T)[1:10])
+  print(sort(table(contracts$Supplier.Reduced[contracts$Supplier.Country == contracts$Borrower.Country]), decreasing = T)[1:10])
+  print(sort(table(contracts$Supplier.Reduced[contracts$Supplier.Country != contracts$Borrower.Country]), decreasing = T)[1:10])
 }
 
 # Two measures, eight beats
@@ -86,9 +88,10 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
     # All the countries in the region
   } else {
     # One country in the region
-    # this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
     this.gdp <- subset(gdp, Country == country & Year == year)[1,'GDP']
     this.population <- subset(population, Country == country & Year == year)[1,'Population']
+
+    this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
   }
 
   list(
