@@ -17,11 +17,13 @@ if (!('a' %in% ls())) {
 }
 
 if (!('gdp' %in% ls())) {
-  .gdp.wide <- read.csv('gdp.csv')
+  gdp <- read.csv('gdp.csv')
+  names(gdp) <- c('Country','Country.Code','Year','GDP')
 }
 
 if (!('population' %in% ls())) {
   population <- read.csv('population.csv')
+  names(population) <- c('Country','Country.Code','Year','Population')
 }
 
 eda <- function() {
@@ -69,6 +71,13 @@ eda <- function() {
 
 # Two measures, eight beats
 phrase <- function(contracts, gdp, population, year, region, country = '') {
+
+  
+  region.records <- data.frame(
+    Country = unique(contracts$Borrower.Country[contracts$Region == region]),
+    Year = year)
+  join(region.records, gdp)
+
   if (country == '') {
     # No country, just the region
   } else if (country == '*') {
@@ -76,8 +85,8 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
   } else {
     # One country in the region
     # this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
-    this.gdp <- subset(gdp, Country.Name == country & Year == year[1,'Value'])
-    this.population <- subset(population, Country.Name == country & Year == year)[1,'Value']
+    this.gdp <- subset(gdp, Country == country & Year == year[1,'GDP'])
+    this.population <- subset(population, Country == country & Year == year)[1,'Population']
   }
 
   list(
