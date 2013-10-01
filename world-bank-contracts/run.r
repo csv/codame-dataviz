@@ -78,30 +78,39 @@ eda <- function() {
 phrase <- function(contracts, gdp, population, year, region = NULL, country = NULL) {
 
   
-  region.records <- data.frame(
-    Country = unique(contracts$Borrower.Country[contracts$Region == region]),
-    Year = year)
-  region.stats <- join(join(region.records, gdp), population)
-  this.region.gdp <- sum(region.stats$GDP, na.rm = TRUE)
-  this.region.population <- sum(region.stats$Population, na.rm = TRUE)
 
-  region.drones <- list(
-    # Scale each drone to an eight-beat-long note.
-    drone1 = this.region.gdp,
-    drone2 = this.region.population
-  )
 
   if (is.null(country) & !is.null(region)) {
-    # No country, just the region
-    drones <- region.drones
+    # All countries in the region
+    region.records <- data.frame(
+      Country = unique(contracts$Borrower.Country[contracts$Region == region]),
+      Year = year)
+    region.stats <- join(join(region.records, gdp), population)
+    this.region.gdp <- sum(region.stats$GDP, na.rm = TRUE)
+    this.region.population <- sum(region.stats$Population, na.rm = TRUE)
+
+    drones <- list(
+      drone1 = this.region.gdp,
+      drone2 = this.region.population
+    )
     melody <- list()
 
   } else if (is.null(country) & is.null(region)) {
-    # All the countries in the region
-    drones <- region.drones
-    melody <- list() # XXX change this evenutally
+    # All the countries that year
+    this.gdp <- sum(gdp[gdp$Year == year,'GDP'])
+    this.population <- sum(population[population$Year == year,'Population'])
 
-    this.contracts <- subset(contracts, Region == region & Year == year)
+    this.contracts <- subset(contracts, Year == year)
+
+    dlply(this.contracts, 'Region', function(df) {
+    table(this.contracts$Year.Eighth)
+
+    ddply(this.contracts, c('Region'), function(df) {
+      df$
+    })
+
+    drones <- list()
+    melody <- list() # XXX change this evenutally
 
   } else {
     # One country in the region
@@ -114,11 +123,6 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
     domestic.contracts <- table(this.contracts[is.domestic,'Year.Eighth'])
     foreign.contracts <- table(this.contracts[!is.domestic,'Year.Eighth'])
 
-  # country.drones <- list(
-  #   drone3 = this.gdp,
-  #   drone4 = this.population
-  # )
-  # drones <- c(region.drones, country.drones)
     drones <- list(
       drone1 = this.gdp,
       drone2 = this.population
@@ -130,6 +134,7 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
     )
   }
 
+  # Scale each drone to an eight-beat-long note.
   c(drones, melody)
 }
 
