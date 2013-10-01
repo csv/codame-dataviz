@@ -75,7 +75,7 @@ eda <- function() {
 }
 
 # Two measures, eight beats
-phrase <- function(contracts, gdp, population, year, region, country = '') {
+phrase <- function(contracts, gdp, population, year, region = NULL, country = NULL) {
 
   
   region.records <- data.frame(
@@ -91,15 +91,17 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
     drone2 = this.region.population
   )
 
-  if (country == '') {
+  if (is.null(country) & !is.null(region)) {
     # No country, just the region
     drones <- region.drones
     melody <- list()
 
-  } else if (country == '*') {
+  } else if (is.null(country) & is.null(region)) {
     # All the countries in the region
     drones <- region.drones
     melody <- list() # XXX change this evenutally
+
+    this.contracts <- subset(contracts, Region == region & Year == year)
 
   } else {
     # One country in the region
