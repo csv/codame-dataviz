@@ -112,10 +112,15 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
     domestic.contracts <- table(this.contracts[is.domestic,'Year.Eighth'])
     foreign.contracts <- table(this.contracts[!is.domestic,'Year.Eighth'])
 
-    drones <- c(region.drones, list(
-      drone3 = this.gdp,
-      drone4 = this.population
-    ))
+  # country.drones <- list(
+  #   drone3 = this.gdp,
+  #   drone4 = this.population
+  # )
+  # drones <- c(region.drones, country.drones)
+    drones <- list(
+      drone1 = this.gdp,
+      drone2 = this.population
+    )
 
     melody <- list(
       melody1 = domestic.contracts,
@@ -126,5 +131,9 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
   c(drones, melody)
 }
 
-m1 <- phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone')
-m2 <- phrase(contracts, gdp, population, 2009, 'SOUTH ASIA', 'Bangladesh')
+m1.1 <- phrase(contracts, gdp, population, 2003, 'AFRICA', '')
+m1.2 <- phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone')
+m1.3 <- phrase(contracts, gdp, population, 2003, 'AFRICA', '*')
+m2.1 <- phrase(contracts, gdp, population, 2009, 'SOUTH ASIA', '')
+m2.2 <- phrase(contracts, gdp, population, 2009, 'SOUTH ASIA', 'Bangladesh')
+m2.3 <- phrase(contracts, gdp, population, 2009, 'SOUTH ASIA', '*')
