@@ -78,7 +78,7 @@ eda <- function() {
 }
 
 # Two measures, eight beats
-phrase <- function(contracts, gdp, population, year, region = NULL, country = NULL, melody = TRUE) {
+phrase <- function(contracts, gdp, population, year, region = NULL, country = NULL, play.melody = TRUE) {
   if (is.null(country) & is.null(region)) {
     # All the countries that year
     this.gdp <- sum(gdp[gdp$Year == year,'GDP'])
@@ -117,7 +117,7 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
   }
 
   # Scale each drone to an eight-beat-long note.
-  if (melody) {
+  if (play.melody) {
     c(drones, melody)
   } else {
     drones
@@ -126,13 +126,9 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
 
 song <- list(
   y2003 = list(
-    intro  = phrase(contracts, gdp, population, 2003, melody = FALSE),
-    africa = phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone', melody = TRUE),
-    out    = phrase(contracts, gdp, population, 2003, melody = TRUE)
-      
-m1.1 <- phrase(contracts, gdp, population, 2003, 'AFRICA', '')
-m1.2 <- phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone')
-m1.3 <- phrase(contracts, gdp, population, 2003, 'AFRICA', '*')
-m2.1 <- phrase(contracts, gdp, population, 2009, 'SOUTH ASIA', '')
-m2.2 <- phrase(contracts, gdp, population, 2009, 'SOUTH ASIA', 'Bangladesh')
-m2.3 <- phrase(contracts, gdp, population, 2009, 'SOUTH ASIA', '*')
+    intro      = phrase(contracts, gdp, population, 2003, play.melody = FALSE),
+    africa     = phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone', play.melody = TRUE),
+    south.asia = phrase(contracts, gdp, population, 2003, 'SOUTH ASIA', 'Bangladesh'),
+    out        = phrase(contracts, gdp, population, 2003, play.melody = TRUE)
+  )
+)
