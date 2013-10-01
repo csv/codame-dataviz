@@ -75,6 +75,11 @@ eda <- function() {
   print(sort(table(contracts$Supplier.Reduced), decreasing = T)[1:10])
   print(sort(table(contracts$Supplier.Reduced[contracts$Supplier.Country == contracts$Borrower.Country]), decreasing = T)[1:10])
   print(sort(table(contracts$Supplier.Reduced[contracts$Supplier.Country != contracts$Borrower.Country]), decreasing = T)[1:10])
+
+
+
+  mauritania <- subset(contracts, Year == 2011 & Borrower.Country == 'Mauritania')
+  ddply(mauritania[c('Project.ID','Total.Contract.Amount..USD.')], 'Project.ID', function(df) { c( Project.Cost = sum(df$Total.Contract.Amount..USD.)) })
 }
 
 # Two measures, eight beats
@@ -84,7 +89,6 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
     gdp <- subset(gdp, Year == year)
     population <- subset(population, Year == year)
   }
-
 
   if (!is.null(country) & is.null(region)){
     region <- subset(contracts, Borrower.Country == country)[1,'Region']
@@ -111,11 +115,11 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
     this.gdp <- subset(gdp, Country == country)[1,'GDP']
     this.population <- subset(population, Country == country)[1,'Population']
 
-    this.contracts <- subset(contracts, Borrower.Country == country)
+    contracts <- subset(contracts, Borrower.Country == country)
 
-    is.domestic <- this.contracts$Borrower.Country == this.contracts$Supplier.Country
-    domestic.contracts <- table(this.contracts[is.domestic,'Year.Eighth'])
-    foreign.contracts <- table(this.contracts[!is.domestic,'Year.Eighth'])
+    is.domestic <- contracts$Borrower.Country == contracts$Supplier.Country
+    domestic.contracts <- table(contracts[is.domestic,'Year.Eighth'])
+    foreign.contracts <- table(contracts[!is.domestic,'Year.Eighth'])
 
     drones <- list(
       drone1 = this.gdp,
@@ -130,7 +134,12 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
 
   # Scale each drone to an eight-beat-long note.
   if (play.melody) {
-    c(drones, melody)
+    projects <- ddply(contracts[c('Project.Name','Total.Contract.Amount..USD.')], 'Project.Name', function(df) { c( Project.Cost = sum(df$Total.Contract.Amount..USD.)) })
+
+    # The most expensive project in that country that year
+    c(drones, melody, list(
+      lyrics = projects$Project.Name[order(projects$Project.Cost, decreasing = TRUE)[1]]
+    ))
   } else {
     drones
   }
