@@ -17,6 +17,7 @@ if (!('a' %in% ls())) {
   contracts$Year.Week <- as.numeric(strftime(contracts$Contract.Signing.Date, format = '%W'))
   contracts$Year.Eighth <- floor(contracts$Year.Week * 8 / 53)
   contracts$Year.Eighth[contracts$Year.Eighth == 8] <- 7
+  contracts$Year.Eighth <- factor(contracts$Year.Eighth, levels = 0:7)
 }
 
 if (!('gdp' %in% ls())) {
