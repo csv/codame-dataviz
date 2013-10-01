@@ -3,6 +3,8 @@ library(ggplot2)
 library(scales)
 library(plyr)
 
+library(ddr)
+
 if (!('a' %in% ls())) {
   a <- read.csv('major-contract-awards.csv', stringsAsFactors = FALSE)
   a$As.of.Date <- strptime(a$As.of.Date, '%m/%d/%Y 12:00:00 AM')
@@ -68,4 +70,13 @@ eda <- function() {
   print(sort(table(a$Supplier.Reduced), decreasing = T)[1:10])
   print(sort(table(a$Supplier.Reduced[a$Supplier.Country == a$Borrower.Country]), decreasing = T)[1:10])
   print(sort(table(a$Supplier.Reduced[a$Supplier.Country != a$Borrower.Country]), decreasing = T)[1:10])
+}
+
+# Four measures (16 beats), one per business quarter
+phrase <- function(contracts, gdp, year, region, country) {
+# this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
+  this.gdp <- subset(gdp, Country == country & Year == year)
+
+
+  # Scale this.gdp to a note, and play it for the whole measure.
 }
