@@ -3,7 +3,8 @@ library(ggplot2)
 library(scales)
 library(plyr)
 
-library(ddr)
+# library(ddr)
+# ddr_init(player="/usr/bin/env mplayer'")
 
 if (!('a' %in% ls())) {
   a <- read.csv('major-contract-awards.csv', stringsAsFactors = FALSE)
@@ -125,5 +126,5 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
   c(drones, melody)
 }
 
-ddr_init(player="/usr/bin/env mplayer'")
-m <- phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone')
+m1 <- phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone')
+m2 <- phrase(contracts, gdp, population, 2009, 'SOUTH ASIA', 'Bangladesh')
