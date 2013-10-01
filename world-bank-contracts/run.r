@@ -80,11 +80,13 @@ eda <- function() {
 phrase <- function(contracts, gdp, population, year, region, country) {
 # this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
   this.gdp <- subset(gdp, Country == country & Year == year)
-  this.population <- subset(population, Country == country & Year == year) 
+  this.population <- subset(population, Country.Name == country & Year == year) 
 
   list(
     # Scale drones to a note, and play them for both measures.
-    drone1 <- this.gdp[1,'GDP'],
-    drone2 <- this.population[1,'Value']
+    drone1 = this.gdp[1,'GDP'],
+    drone2 = this.population[1,'Value']
   )
 }
+
+m <- phrase(contracts, gdp, population, 2003, 'ASIA', 'Bangladesh')
