@@ -19,6 +19,9 @@ if (!('a' %in% ls())) {
   contracts$Year.Eighth <- floor(contracts$Year.Week * 8 / 53)
   contracts$Year.Eighth[contracts$Year.Eighth == 8] <- 7
   contracts$Year.Eighth <- factor(contracts$Year.Eighth, levels = 0:7)
+
+  # Remove contracts without regions
+  contracts <- subset(contracts, Region != 'Not assigned' & Region != 'OTHER')
 }
 
 if (!('gdp' %in% ls())) {
@@ -101,12 +104,8 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
     this.population <- sum(population[population$Year == year,'Population'])
 
     this.contracts <- subset(contracts, Year == year)
-
     dlply(this.contracts, 'Region', function(df) {
-    table(this.contracts$Year.Eighth)
-
-    ddply(this.contracts, c('Region'), function(df) {
-      df$
+      table(df$Year.Eighth)
     })
 
     drones <- list()
