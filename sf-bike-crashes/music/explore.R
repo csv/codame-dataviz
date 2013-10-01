@@ -1,11 +1,13 @@
-setwd('~/Dropbox/code/codame-dataviz/music')
+setwd('~/Dropbox/code/codame-dataviz/sf-bike-crashes')
 library(lubridate)
 library(plyr)
 library(ggplot2)
+
 d <- read.csv('data/crashses.csv', stringsAsFactors=F)
 
 # add year month counts
 d$year_month <- paste(strftime(mdy_hm(d$datetime), "%Y-%m"), "-01", sep="")
+d$datetime <- parse_date_time(gsub("p.m.", "PM", gsub("a.m.", "AM", d$datetime)), "%m/%d/%Y %H:%M %p")
 counts <- ddply(d, 'year_month', function(x) {data.frame(month_count=nrow(x))})
 shell <- data.frame(
   day = seq(from=as.Date('2005-01-01'), to=as.Date('2009-12-31'), by='day')
@@ -38,4 +40,12 @@ d$hr <- NULL
 d$dist_from_intersection <- d$disfm
 d$disfm <- NULL
 
+d <- d[order(d$year_month, d$day),]
 
+d$week <- week(d$datetime)
+d$year_week <- paste(d$year, sprintf("%02d", d$week), sep="-")
+
+ddply(d, aes(x=year_week, y=facet(p1))) + geom_bar()
+barplot(table(d$p1, d$year_week ))
+
+head(d)
