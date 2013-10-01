@@ -72,11 +72,13 @@ eda <- function() {
   print(sort(table(a$Supplier.Reduced[a$Supplier.Country != a$Borrower.Country]), decreasing = T)[1:10])
 }
 
-# Four measures (16 beats), one per business quarter
+# Two measures, eight beats
 phrase <- function(contracts, gdp, year, region, country) {
 # this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
   this.gdp <- subset(gdp, Country == country & Year == year)
 
-
-  # Scale this.gdp to a note, and play it for the whole measure.
+  # Scale this.gdp to a note, and play it for both measures.
+  list(
+    drone1 <- this.gdp[1,'GDP']
+    drone2 <-
 }
