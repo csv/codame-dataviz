@@ -78,7 +78,14 @@ eda <- function() {
 }
 
 # Two measures, eight beats
-phrase <- function(contracts, gdp, population, year, region = NULL, country = NULL, play.melody = TRUE) {
+phrase <- function(contracts, gdp, population, year = NULL, region = NULL, country = NULL, play.melody = TRUE) {
+  if (!is.null(year)) {
+    contracts <- subset(contracts, Year == year)
+    gdp <- subset(gdp, Year == year)
+    population <- subset(population, Year == year)
+  }
+
+
   if (!is.null(country) & is.null(region)){
     region <- subset(contracts, Borrower.Country == country)[1,'Region']
   } else if (is.null(country) & !is.null(region)){
@@ -87,25 +94,24 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
 
   if (is.null(country) & is.null(region)) {
     # All the countries that year
-    this.gdp <- sum(gdp[gdp$Year == year,'GDP'])
-    this.population <- sum(population[population$Year == year,'Population'])
+    this.gdp <- sum(gdp$GDP)
+    this.population <- sum(population$Population)
     drones <- list(
       drone1 = this.gdp,
       drone2 = this.population
     )
 
-    this.contracts <- subset(contracts, Year == year)
-    melody <- dlply(this.contracts, 'Region', function(df) {
+    melody <- dlply(contracts, 'Region', function(df) {
       table(df$Year.Eighth)
     })
 
 
   } else {
     # One country in the region
-    this.gdp <- subset(gdp, Country == country & Year == year)[1,'GDP']
-    this.population <- subset(population, Country == country & Year == year)[1,'Population']
+    this.gdp <- subset(gdp, Country == country)[1,'GDP']
+    this.population <- subset(population, Country == country)[1,'Population']
 
-    this.contracts <- subset(contracts, Borrower.Country == country & Year == year)
+    this.contracts <- subset(contracts, Borrower.Country == country)
 
     is.domestic <- this.contracts$Borrower.Country == this.contracts$Supplier.Country
     domestic.contracts <- table(this.contracts[is.domestic,'Year.Eighth'])
@@ -133,17 +139,29 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
 # Song: 16 Stanzas
 song <- list(
   # Stanza: 8 Phrases
-  y2003 = list(
+  intro = list(
     # Phrase: 2 measures (8 beats)
+    intro      = phrase(contracts, gdp, population, play.melody = FALSE),
+    africa     = phrase(contracts, gdp, population, region = 'AFRICA', play.melody = FALSE),
+    south.asia = phrase(contracts, gdp, population, region = 'SOUTH ASIA', play.melody = FALSE),
+    out        = phrase(contracts, gdp, population, play.melody = TRUE)
+  ),
+  y2003 = list(
     intro      = phrase(contracts, gdp, population, 2003, play.melody = FALSE),
-    africa     = phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone', play.melody = TRUE),
-    south.asia = phrase(contracts, gdp, population, 2003, 'SOUTH ASIA', 'Bangladesh'),
+    africa     = phrase(contracts, gdp, population, 2003, region = 'AFRICA', country = 'Sierra Leone', play.melody = TRUE),
+    south.asia = phrase(contracts, gdp, population, 2003, region = 'SOUTH ASIA', country = 'Bangladesh'),
     out        = phrase(contracts, gdp, population, 2003, play.melody = TRUE)
   ),
   y2004 = list(
     intro      = phrase(contracts, gdp, population, 2004, play.melody = FALSE),
-    africa     = phrase(contracts, gdp, population, 2004, 'AFRICA', play.melody = TRUE),
-    south.asia = phrase(contracts, gdp, population, 2004, 'SOUTH ASIA', play.melody = TRUE),
+    africa     = phrase(contracts, gdp, population, 2004, region = 'AFRICA', play.melody = TRUE),
+    south.asia = phrase(contracts, gdp, population, 2004, region = 'SOUTH ASIA', play.melody = TRUE),
     out        = phrase(contracts, gdp, population, 2004, play.melody = TRUE)
+  ),
+  out = list(
+    intro      = phrase(contracts, gdp, population, play.melody = TRUE),
+    africa     = phrase(contracts, gdp, population, region = 'AFRICA', play.melody = TRUE),
+    south.asia = phrase(contracts, gdp, population, region = 'SOUTH ASIA', play.melody = TRUE),
+    out        = phrase(contracts, gdp, population, play.melody = TRUE)
   )
 )
