@@ -84,10 +84,22 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
   this.region.gdp <- sum(region.stats$GDP, na.rm = TRUE)
   this.region.population <- sum(region.stats$Population, na.rm = TRUE)
 
+  region.drones <- list(
+    # Scale each drone to an eight-beat-long note.
+    drone1 = this.region.gdp,
+    drone2 = this.region.population,
+  )
+
   if (country == '') {
     # No country, just the region
+    drones <- region.drones
+    melody <- list()
+
   } else if (country == '*') {
     # All the countries in the region
+    drones <- region.drones
+    melody <- list() # XXX change this evenutally
+
   } else {
     # One country in the region
     this.gdp <- subset(gdp, Country == country & Year == year)[1,'GDP']
@@ -98,19 +110,19 @@ phrase <- function(contracts, gdp, population, year, region, country = '') {
     is.domestic <- this.contracts$Borrower.Country == this.contracts$Supplier.Country
     domestic.contracts <- table(this.contracts[is.domestic,'Year.Eighth'])
     foreign.contracts <- table(this.contracts[!is.domestic,'Year.Eighth'])
+
+    drones <- c(region.drones, list(
+      drone3 = this.gdp,
+      drone4 = this.population
+    ))
+
+    melody <- list(
+      melody1 = domestic.contracts,
+      melody2 = foreign.contracts
+    )
   }
 
-  list(
-    # Scale each drone to an eight-beat-long note.
-    drone1 = this.region.gdp,
-    drone2 = this.region.population,
-
-    drone3 = this.gdp,
-    drone4 = this.population,
-
-    melody1 = domestic.contracts,
-    melody2 = foreign.contracts
-  )
+  c(drones, melody)
 }
 
 ddr_init(player="/usr/bin/env mplayer'")
