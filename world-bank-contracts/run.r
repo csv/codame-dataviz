@@ -78,38 +78,21 @@ eda <- function() {
 }
 
 # Two measures, eight beats
-phrase <- function(contracts, gdp, population, year, region = NULL, country = NULL) {
-
-  
-
-
-  if (is.null(country) & !is.null(region)) {
-    # All countries in the region
-    region.records <- data.frame(
-      Country = unique(contracts$Borrower.Country[contracts$Region == region]),
-      Year = year)
-    region.stats <- join(join(region.records, gdp), population)
-    this.region.gdp <- sum(region.stats$GDP, na.rm = TRUE)
-    this.region.population <- sum(region.stats$Population, na.rm = TRUE)
-
-    drones <- list(
-      drone1 = this.region.gdp,
-      drone2 = this.region.population
-    )
-    melody <- list()
-
-  } else if (is.null(country) & is.null(region)) {
+phrase <- function(contracts, gdp, population, year, region = NULL, country = NULL, melody = TRUE) {
+  if (is.null(country) & is.null(region)) {
     # All the countries that year
     this.gdp <- sum(gdp[gdp$Year == year,'GDP'])
     this.population <- sum(population[population$Year == year,'Population'])
+    drones <- list(
+      drone1 = this.gdp,
+      drone2 = this.population
+    )
 
     this.contracts <- subset(contracts, Year == year)
-    dlply(this.contracts, 'Region', function(df) {
+    melody <- dlply(this.contracts, 'Region', function(df) {
       table(df$Year.Eighth)
     })
 
-    drones <- list()
-    melody <- list() # XXX change this evenutally
 
   } else {
     # One country in the region
@@ -134,9 +117,19 @@ phrase <- function(contracts, gdp, population, year, region = NULL, country = NU
   }
 
   # Scale each drone to an eight-beat-long note.
-  c(drones, melody)
+  if (melody) {
+    c(drones, melody)
+  } else {
+    drones
+  }
 }
 
+song <- list(
+  y2003 = list(
+    intro  = phrase(contracts, gdp, population, 2003, melody = FALSE),
+    africa = phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone', melody = TRUE),
+    out    = phrase(contracts, gdp, population, 2003, melody = TRUE)
+      
 m1.1 <- phrase(contracts, gdp, population, 2003, 'AFRICA', '')
 m1.2 <- phrase(contracts, gdp, population, 2003, 'AFRICA', 'Sierra Leone')
 m1.3 <- phrase(contracts, gdp, population, 2003, 'AFRICA', '*')
