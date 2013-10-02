@@ -256,7 +256,7 @@ main.plots <- function() {
     for (i in 1:nrow(table2.toplot)) {
          fp = sprintf('slideshow/%04d.png', i)
          cat(sprintf("writng %s to file\n", fp))
-         png(fp, width = 1300, height = 800) 
+         png(fp, width = 1920, height = 1080) 
          frame(i)
          dev.off()
     }

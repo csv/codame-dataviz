@@ -31,7 +31,7 @@ def grab_screenshot(indexed_date):
 
 
 b = webdriver.Chrome()
-b.set_window_size(1280, 950)
+b.set_window_size(1920, 1080)
 
 base_url = "http://localhost:8000/#"
 min_date = datetime(year=2005, month=01, day=01)

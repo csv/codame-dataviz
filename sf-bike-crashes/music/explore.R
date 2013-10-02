@@ -16,9 +16,10 @@ shell$year_month <- paste(strftime(shell$day, '%Y-%m'), "-01", sep="")
 month_counts <- join(counts, shell, by='year_month', type='right')
 write.csv(month_counts, 'data/month_counts.csv', row.names=F)
  
-plot(x=as.Date(counts$year_month), y=counts$month_count, type="l")
+plot(x=as.Date(counts$day), y=counts$month_count, type="l")
 d <- join(counts, d, by="year_month", type="right")
-plot(month_counts$month_count, month_counts$month_day, type="l")
+
+
 # munge lighting conditions
 d$lightingco[d$lightingco=='Dark - no street lights'] <- 'Dark'
 d$lightingco[d$lightingco=='Dark - street lights'] <- 'Dark'
@@ -29,6 +30,25 @@ d$lightingco[d$lightingco==''] <- NA
 # munge at-fault
 d$p1[d$p1=='PARKED_AUTO'] <- 'AUTO'
 d$p2[d$p2=='PARKED_AUTO'] <- 'AUTO'
+d$p1[d$p1=='SOLO_ACCIDENT'] <- 'BICYCLIST'
+d$p1[d$p1=='NO_FAULT'] <- 'OTHER'
+d$p1[d$p1=='PEDESTRIAN'] <- 'OTHER'
+
+# at fault per month barplot
+bike.col = '#FC8D6250'
+car.col = '#8da0cb50'
+other.col= '#ffff9950'
+par(bg='black')
+svg(filename='barplot.svg', width=9, height=5)
+barplot(table(d$p1, d$year_month), border=NA, col=c(bike.col, car.col, other.col))
+dev.off()
+
+# bake this to file for sonification!
+tab <- table(d$p1, d$year_month)
+mat <- as.matrix(t(tab))
+df <- data.frame(year_month=row.names(mat), auto=mat[,1], bike=mat[,2], other=mat[,3])
+at_fault <- join(df, shell, by='year_month')
+write.csv(at_fault, 'data/at_fault.csv', row.names=F)
 
 # munge road surface
 d$roadsurfac[d$roadsurfac=='Slippery (muddyy, oily, etc.)'] <- 'Wet'
@@ -39,6 +59,9 @@ d$hit_n_run <- ifelse(d$hit_n_run=='YES', 1, 0)
 d$hr <- NULL
 d$dist_from_intersection <- d$disfm
 d$disfm <- NULL
+
+tab <- table(d$p1, d$year_month)
+barplot(tab)
 
 d <- d[order(d$year_month, d$day),]
 
