@@ -35,6 +35,18 @@ def add_phrase(beat, midi_track, time, phrase):
             )
     return midi_track, (time + beat)
 
+def str_count_parse(count):
+  if isinstance(count, basestring):
+    items = count.split('/')
+    return float(items[0]) / float(items[1])
+  else:
+    return count
+
+def bpm_time(bpm=120, count=0.25):
+  count = str_count_parse(count)
+  onebar = float((60.0/float(bpm))*4.0)
+  return onebar*float(count)
+
 bpm = 120
 midi_track = MIDIFile(1)
 midi_track.addTempo(track=0, time=0,tempo=bpm)
