@@ -106,7 +106,7 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
     )
 
     melody <- dlply(contracts, 'Region', function(df) {
-      colMeans(table(df$Country, df$Year.Eighth)) / max.eighthly.df
+      colMeans(table(df$Country, df$Year.Eighth)) / max.eighthly.contracts
     })
 
 
