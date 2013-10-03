@@ -16,7 +16,7 @@ def add_phrase(beat, midi_track, time, phrase):
     total_melody = sum([v for k,v in phrase.items() if k in set('01234567')])
     for instrument,value in phrase.items():
         if instrument.startswith('drone'):
-            if value != 'NA':
+            if value not in {'NA', 'NaN'}:
                 midi_track.addNote(
                     track=0,
                     channel=0,
