@@ -14,7 +14,7 @@ def wait_cb():
         try:
             b.find_element_by_id("is-available")
         except NoSuchElementException:
-            return False
+            return Falseew
         else:
             return True
     return callback
@@ -30,8 +30,8 @@ def grab_screenshot(indexed_date):
     time.sleep(0.5)
 
 
-b = webdriver.Chrome()
-b.set_window_size(1920, 1080)
+b = webdriver.Firefox()
+b.set_window_size(1280, 800)
 
 base_url = "http://localhost:8000/#"
 min_date = datetime(year=2005, month=01, day=01)

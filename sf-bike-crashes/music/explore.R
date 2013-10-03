@@ -3,21 +3,24 @@ library(lubridate)
 library(plyr)
 library(ggplot2)
 
-d <- read.csv('data/crashses.csv', stringsAsFactors=F)
+d <- read.csv('data/crashes.csv', stringsAsFactors=F)
 
 # add year month counts
 d$year_month <- paste(strftime(mdy_hm(d$datetime), "%Y-%m"), "-01", sep="")
 d$datetime <- parse_date_time(gsub("p.m.", "PM", gsub("a.m.", "AM", d$datetime)), "%m/%d/%Y %H:%M %p")
 counts <- ddply(d, 'year_month', function(x) {data.frame(month_count=nrow(x))})
 shell <- data.frame(
-  day = seq(from=as.Date('2005-01-01'), to=as.Date('2009-12-31'), by='day')
+  date = seq(from=as.Date('2005-01-01'), to=as.Date('2009-12-31'), by='day')
   )
-shell$year_month <- paste(strftime(shell$day, '%Y-%m'), "-01", sep="")
+shell$year_month <- paste(strftime(shell$date, '%Y-%m'), "-01", sep="")
 month_counts <- join(counts, shell, by='year_month', type='right')
 write.csv(month_counts, 'data/month_counts.csv', row.names=F)
  
 plot(x=as.Date(counts$day), y=counts$month_count, type="l")
 d <- join(counts, d, by="year_month", type="right")
+
+d$date <- as.Date(d$datetime)
+
 
 
 # munge lighting conditions
@@ -44,11 +47,23 @@ barplot(table(d$p1, d$year_month), border=NA, col=c(bike.col, car.col, other.col
 dev.off()
 
 # bake this to file for sonification!
-tab <- table(d$p1, d$year_month)
+tab <- table(d$p1, d$date)
 mat <- as.matrix(t(tab))
-df <- data.frame(year_month=row.names(mat), auto=mat[,1], bike=mat[,2], other=mat[,3])
-at_fault <- join(df, shell, by='year_month')
-write.csv(at_fault, 'data/at_fault.csv', row.names=F)
+df <- data.frame(date=row.names(mat), auto=mat[,1], bike=mat[,2], other=mat[,3])
+rownames(df) <- NULL
+
+df <- join(df, shell, by='date', type="right")
+df[is.na(df)] <- 0
+
+for (ym in unique(df$year_month)) {
+  df$auto[df$year_month==ym] <- cumsum(df$auto[df$year_month==ym])
+  df$bike[df$year_month==ym] <- cumsum(df$bike[df$year_month==ym])
+  df$other[df$year_month==ym] <- cumsum(df$other[df$year_month==ym])
+}
+write.csv(df, 'data/cum_sum_at_fault_full.csv', row.names=F)
+
+
+
 
 # munge road surface
 d$roadsurfac[d$roadsurfac=='Slippery (muddyy, oily, etc.)'] <- 'Wet'

@@ -18,7 +18,7 @@ for day in crashes.values():
         data.append(row)
 
 df = pd.DataFrame(data)
-df.to_csv('../data/crashses.csv')
+df.to_csv('../data/crashes.csv')
 
 # count by hex_id
 hex_counts = {}
@@ -29,7 +29,6 @@ for day, data in crashes.iteritems():
         else:
             hex_counts[crash['hex_id']] = 1
 hex_counts = sorted(hex_counts.iteritems(), key=itemgetter(1))
-
 
 hex_to_key = {
     'h0.033': 'E5',
@@ -63,7 +62,6 @@ hex_to_key = {
     'h0.012': 'A0'
 }
 
-
 min_date = datetime(year=2005, month=01, day=01)
 max_date =  datetime(year=2009, month=12, day=31)
 date_range = [min_date + timedelta(days=d) for d in range(0 , (max_date - min_date).days + 1)]
@@ -81,7 +79,6 @@ for d in date_range:
     if crashes.has_key(day):
         for crash in crashes[day]:
             key = hex_to_key[crash['hex_id']]
-            print key
             midi_track.addNote(
                 track=0, 
                 channel=0,
@@ -142,3 +139,126 @@ for i in note_indexes:
 binfile = open('midi/crash-months.mid', 'wb')  
 midi_track.writeFile(binfile)
 binfile.close()
+
+
+#   ____    _    ____                ____ ___ _  _______ 
+#  / ___|  / \  |  _ \  __   _____  | __ )_ _| |/ / ____|
+# | |     / _ \ | |_) | \ \ / / __| |  _ \| || ' /|  _|  
+# | |___ / ___ \|  _ <   \ V /\__ \ | |_) | || . \| |___ 
+#  \____/_/   \_\_| \_\   \_/ |___/ |____/___|_|\_\_____|
+
+
+# ASCENDING MELODY
+
+at_fault = pd.read_csv('../data/cum_sum_at_fault.csv')
+at_fault.date = at_fault.date.apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
+vec = list(at_fault.bike)
+vec.extend(list(at_fault.auto))
+
+values = list(set(vec))
+
+bpm=120
+key="A"
+scale=[0,3,5,7,10]
+count='1/4' 
+channel=1
+min_note="A1"
+max_note="G7"
+
+# transform keys and min/max notes
+key = root_to_midi(key)
+min_note = note_to_midi(min_note)
+max_note = note_to_midi(max_note)
+
+# select notes
+notes = build_scale(key, scale, min_note, max_note)
+
+# build lookup table:
+lookup_notes = {}
+for i, v in enumerate(values):
+    lookup_notes[v] = notes[i]
+
+# determinte note length
+beat = bpm_time(bpm, count)
+
+# generate midi file
+midi_track = MIDIFile(2)
+midi_track.addTempo(track=0, time=0,tempo=bpm)
+midi_track.addTempo(track=1, time=0,tempo=bpm)
+t = 0
+prev_auto_note = None
+prev_bike_note = None
+for d in date_range:
+    this_df = at_fault[at_fault.date==d]
+    if len(this_df) > 0:
+
+        # determine notes
+        auto_note = lookup_notes[int(this_df.auto)]
+        bike_note = lookup_notes[int(this_df.bike)]
+
+        if prev_auto_note != auto_note:
+            # add auto notes to midi tracks
+            midi_track.addNote(
+                track=0, 
+                channel=0, 
+                pitch='C2', 
+                time=t, 
+                duration=beat, 
+                volume=auto_note
+            )
+        if prev_bike_note != bike_note:
+            # add bike notes to midi tracks
+            midi_track.addNote(
+                track=1, 
+                channel=0, 
+                pitch='C2', 
+                time=t, 
+                duration=beat, 
+                volume=bike_note
+            )
+        prev_auto_note = auto_note
+        prev_bike_note = bike_note
+
+    t += beat
+
+binfile = open('midi/crash-at-fault-perc.mid', 'wb')  
+midi_track.writeFile(binfile)
+binfile.close()
+
+
+# ASCENDING VELOCITY OF PERCUSSIVE ELEMENT
+at_fault_full = pd.read_csv('../data/cum_sum_at_fault_full.csv')
+at_fault_full.date = at_fault_full.date.apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
+
+bpm = 120
+count = '1/4'
+# determinte note length
+beat = bpm_time(bpm, count)
+
+# generate midi file
+midi_track = MIDIFile(2)
+midi_track.addTempo(track=0, time=0,tempo=bpm)
+midi_track.addTempo(track=1, time=0,tempo=bpm)
+
+t = 0
+for i in at_fault_full.index:
+    midi_track.addControllerEvent(
+        track=0, 
+        channel=0, 
+        time=t, 
+        eventType=2, 
+        paramerter1=at_fault_full.auto[i] + 1
+    )
+    midi_track.addControllerEvent(
+        track=1, 
+        channel=0, 
+        time=t, 
+        eventType=2, 
+        paramerter1=at_fault_full.bike[i] + 1
+    )
+    t += beat
+
+binfile = open('midi/crash-at-fault-percussion-controller.mid', 'wb')  
+midi_track.writeFile(binfile)
+binfile.close()
+
