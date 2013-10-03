@@ -188,3 +188,28 @@ song$out$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = T
 
 # Write to file
 cat(toJSON(song),file="song.json",sep="\n")
+
+# Intro stanza
+video <- list()
+video$intro <- list()
+video$intro$intro <- phrase(contracts, gdp, population, play.melody = FALSE, max.eighthly.contracts = max.eighthly.contracts)
+for (region in unique(contracts$Region)) {
+  video$intro[[region]] <- phrase(contracts, gdp, population, region = region, play.melody = FALSE, max.eighthly.contracts = max.eighthly.contracts)
+}
+video$intro$out <- phrase(contracts, gdp, population, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
+
+# Year stanzas
+for (year in 2000:2013) {
+  video[[as.character(year)]] <- stanza(contracts, gdp, population, year, max.eighthly.contracts = max.eighthly.contracts)
+}
+
+# Outro stanza
+video$out <- list()
+video$out$intro <- phrase(contracts, gdp, population, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
+for (region in unique(contracts$Region)) {
+  video$out[[region]] <- phrase(contracts, gdp, population, region = region, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
+}
+video$out$out <- phrase(contracts, gdp, population, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
+
+# Write to file
+cat(toJSON(video),file="video.json",sep="\n")
