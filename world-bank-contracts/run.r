@@ -83,7 +83,7 @@ eda <- function() {
 }
 
 # Two measures, eight beats
-phrase <- function(contracts, gdp, population, year = NULL, region = NULL, country = NULL, play.melody = TRUE) {
+phrase <- function(contracts, gdp, population, year = NULL, region = NULL, country = NULL, play.melody = TRUE, max.eighthly.contracts = 1) {
   if (!is.null(year)) {
     contracts <- subset(contracts, Year == year)
     gdp <- subset(gdp, Year == year)
@@ -106,7 +106,7 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
     )
 
     melody <- dlply(contracts, 'Region', function(df) {
-      table(df$Year.Eighth)
+      table(df$Year.Eighth) / max.eighthly.contracts
     })
 
 
@@ -118,8 +118,8 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
     contracts <- subset(contracts, Borrower.Country == country)
 
     is.domestic <- contracts$Borrower.Country == contracts$Supplier.Country
-    domestic.contracts <- table(contracts[is.domestic,'Year.Eighth'])
-    foreign.contracts <- table(contracts[!is.domestic,'Year.Eighth'])
+    domestic.contracts <- table(contracts[is.domestic,'Year.Eighth']) / max.eighthly.contracts
+    foreign.contracts <- table(contracts[!is.domestic,'Year.Eighth']) / max.eighthly.contracts
 
     drones <- list(
       drone1 = this.gdp,
@@ -146,12 +146,12 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
 }
 
 
-stanza <- function(contracts, gdp, population, year) {
-  s <- list(intro = phrase(contracts, gdp, population, year = year, play.melody = FALSE))
+stanza <- function(contracts, gdp, population, year, ...) {
+  s <- list(intro = phrase(contracts, gdp, population, year = year, play.melody = FALSE, ...))
   for (region in unique(contracts$Region)) {
-    s[[region]] <- phrase(contracts, gdp, population, year = year, region = 'SOUTH ASIA', play.melody = FALSE)
+    s[[region]] <- phrase(contracts, gdp, population, year = year, region = 'SOUTH ASIA', play.melody = FALSE, ...)
   }
-  s$out = phrase(contracts, gdp, population, year = year, play.melody = TRUE)
+  s$out = phrase(contracts, gdp, population, year = year, play.melody = TRUE, ...)
   s
 }
 
@@ -166,22 +166,22 @@ max.eighthly.contracts <- max(table(contracts$Year, contracts$Region, contracts$
 # Intro stanza
 song <- list()
 song$intro <- list()
-song$intro$intro <- phrase(contracts, gdp.scaled, population.scaled, play.melody = FALSE)
+song$intro$intro <- phrase(contracts, gdp.scaled, population.scaled, play.melody = FALSE, max.eighthly.contracts = max.eighthly.contracts)
 for (region in unique(contracts$Region)) {
-  song$intro[[region]] <- phrase(contracts, gdp.scaled, population.scaled, region = region, play.melody = FALSE)
+  song$intro[[region]] <- phrase(contracts, gdp.scaled, population.scaled, region = region, play.melody = FALSE, max.eighthly.contracts = max.eighthly.contracts)
 }
-song$intro$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE)
+song$intro$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
 
 for (year in 2000:2013) {
-  song[[as.character(year)]] <- stanza(contracts, gdp.scaled, population.scaled, year)
+  song[[as.character(year)]] <- stanza(contracts, gdp.scaled, population.scaled, year, max.eighthly.contracts = max.eighthly.contracts)
 }
 
 # Outro stanza
 song$out <- list()
-song$out$intro <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE)
+song$out$intro <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
 for (region in unique(contracts$Region)) {
-  song$out[[region]] <- phrase(contracts, gdp.scaled, population.scaled, region = region, play.melody = TRUE)
+  song$out[[region]] <- phrase(contracts, gdp.scaled, population.scaled, region = region, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
 }
-song$out$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE)
+song$out$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
 
 cat(toJSON(song),file="song.json",sep="\n")
