@@ -79,7 +79,7 @@ eda <- function() {
 
 
   mauritania <- subset(contracts, Year == 2011 & Borrower.Country == 'Mauritania')
-  ddply(mauritania[c('Project.ID','Total.Contract.Amount..USD.')], 'Project.ID', function(df) { c( Project.Cost = sum(df$Total.Contract.Amount..USD.)) })
+  ddply(mauritania[c('Project.ID','Total.Contract.Amount..USD.')], 'Project.ID', function(df) { c( Project.Cost = mean(df$Total.Contract.Amount..USD.)) })
 }
 
 # Two measures, eight beats
@@ -98,8 +98,8 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
 
   if (is.null(country) & is.null(region)) {
     # All the countries that year
-    this.gdp <- sum(gdp$GDP)
-    this.population <- sum(population$Population)
+    this.gdp <- mean(gdp$GDP)
+    this.population <- mean(population$Population)
     drones <- list(
       drone1 = this.gdp,
       drone2 = this.population
@@ -134,7 +134,7 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
 
   # Scale each drone to an eight-beat-long note.
   if (play.melody) {
-    projects <- ddply(contracts[c('Project.Name','Total.Contract.Amount..USD.')], 'Project.Name', function(df) { c( Project.Cost = sum(df$Total.Contract.Amount..USD.)) })
+    projects <- ddply(contracts[c('Project.Name','Total.Contract.Amount..USD.')], 'Project.Name', function(df) { c( Project.Cost = mean(df$Total.Contract.Amount..USD.)) })
 
     # The most expensive project in that country that year
     c(drones, melody, list(
@@ -155,27 +155,31 @@ stanza <- function(contracts, gdp, population, year) {
   s
 }
 
+gdp.scaled <- gdp
+gdp.scaled$GDP <- scale(gdp$GDP)
+
+population.scaled <- population
+population.scaled$Population <- scale(population$Population)
 
 # Intro stanza
 song <- list()
 song$intro <- list()
-song$intro$intro <- phrase(contracts, gdp, population, play.melody = FALSE)
+song$intro$intro <- phrase(contracts, gdp.scaled, population.scaled, play.melody = FALSE)
 for (region in unique(contracts$Region)) {
-  song$intro[[region]] <- phrase(contracts, gdp, population, region = region, play.melody = FALSE)
+  song$intro[[region]] <- phrase(contracts, gdp.scaled, population.scaled, region = region, play.melody = FALSE)
 }
-song$intro$out <- phrase(contracts, gdp, population, play.melody = TRUE)
+song$intro$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE)
 
 for (year in 2000:2013) {
-  song[[as.character(year)]] <- stanza(contracts, gdp, population, year)
+  song[[as.character(year)]] <- stanza(contracts, gdp.scaled, population.scaled, year)
 }
 
 # Outro stanza
 song$out <- list()
-song$out$intro <- phrase(contracts, gdp, population, play.melody = TRUE)
+song$out$intro <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE)
 for (region in unique(contracts$Region)) {
-  song$out[[region]] <- phrase(contracts, gdp, population, region = region, play.melody = TRUE)
+  song$out[[region]] <- phrase(contracts, gdp.scaled, population.scaled, region = region, play.melody = TRUE)
 }
-song$out$out <- phrase(contracts, gdp, population, play.melody = TRUE)
-
+song$out$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE)
 
 cat(toJSON(song),file="song.json",sep="\n")
