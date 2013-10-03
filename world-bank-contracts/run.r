@@ -145,35 +145,34 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
   }
 }
 
-# Song: 16 Stanzas
-song <- list(
-  # Stanza: 8 Phrases
-  intro = list(
-    # Phrase: 2 measures (8 beats)
-    intro      = phrase(contracts, gdp, population, play.melody = FALSE),
-    africa     = phrase(contracts, gdp, population, region = 'AFRICA', play.melody = FALSE),
-    south.asia = phrase(contracts, gdp, population, region = 'SOUTH ASIA', play.melody = FALSE),
-    out        = phrase(contracts, gdp, population, play.melody = TRUE)
-  ),
-  y2003 = list(
-    intro      = phrase(contracts, gdp, population, 2003, play.melody = FALSE),
-    africa     = phrase(contracts, gdp, population, 2003, region = 'AFRICA', country = 'Sierra Leone', play.melody = TRUE),
-    south.asia = phrase(contracts, gdp, population, 2003, region = 'SOUTH ASIA', country = 'Bangladesh'),
-    out        = phrase(contracts, gdp, population, 2003, play.melody = TRUE)
-  ),
-  y2004 = list(
-    intro      = phrase(contracts, gdp, population, 2004, play.melody = FALSE),
-    africa     = phrase(contracts, gdp, population, 2004, region = 'AFRICA', play.melody = TRUE),
-    south.asia = phrase(contracts, gdp, population, 2004, region = 'SOUTH ASIA', play.melody = TRUE),
-    out        = phrase(contracts, gdp, population, 2004, play.melody = TRUE)
-  ),
-  out = list(
-    intro      = phrase(contracts, gdp, population, play.melody = TRUE),
-    africa     = phrase(contracts, gdp, population, region = 'AFRICA', play.melody = TRUE),
-    south.asia = phrase(contracts, gdp, population, region = 'SOUTH ASIA', play.melody = TRUE),
-    out        = phrase(contracts, gdp, population, play.melody = TRUE)
-  )
-)
+
+stanza <- function(year) {
+  s <- list(intro = phrase(contracts, gdp, population, year = year, play.melody = FALSE))
+  for (region in unique(contracts$Region)) {
+    s[[region]] r- phrase(contracts, gdp, population, year = year, region = 'SOUTH ASIA', play.melody = FALSE),
+  }
+  s$out = phrase(contracts, gdp, population, year = year, play.melody = TRUE)
+  s
+}
+
+
+# Intro stanza
+song <- list()
+song$intro <- list()
+song$intro$intro <- phrase(contracts, gdp, population, play.melody = FALSE),
+for (region in unique(contracts$Region)) {
+  song$intro[[region]] <- phrase(contracts, gdp, population, region = region, play.melody = FALSE)
+}
+song$intro$out <- phrase(contracts, gdp, population, play.melody = TRUE)
+
+
+# Outro stanza
+song$out <- list()
+song$out$intro <- phrase(contracts, gdp, population, play.melody = TRUE),
+for (region in unique(contracts$Region)) {
+  song$out[[region]] <- phrase(contracts, gdp, population, region = region, play.melody = TRUE)
+}
+song$out$out <- phrase(contracts, gdp, population, play.melody = TRUE)
 
 
 cat(toJSON(song),file="song.json",sep="\n")
