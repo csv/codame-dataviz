@@ -156,10 +156,10 @@ stanza <- function(contracts, gdp, population, year, ...) {
 }
 
 gdp.scaled <- gdp
-gdp.scaled$GDP <- scale(gdp$GDP)
+gdp.scaled$GDP <- gdp$GDP / max(gdp$GDP)
 
 population.scaled <- population
-population.scaled$Population <- scale(population$Population)
+population.scaled$Population <- population$Population / max(population$Population)
 
 max.eighthly.contracts <- max(table(contracts$Year, contracts$Region, contracts$Year.Eighth))
 
