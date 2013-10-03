@@ -23,5 +23,24 @@ for d in date_range:
             )
     t += beat
 
-def add_phrase(midi_track, time, phrase):
-    return midi_track, time
+def add_phrase(beat, midi_track, time, phrase):
+    for instrument in phrase:
+        if instrument.startswith('drone'):
+            midi_track.addNote(
+                track=0,
+                channel=0,
+                pitch=key,
+                duration=beat,
+                volume=100,
+                time=time
+            )
+        elif instrument in set('01234567'):
+            midi_track.addNote(
+                track=0,
+                channel=0,
+                pitch=key,
+                duration=beat,
+                volume=100,
+                time=time
+            )
+    return midi_track, (time + beat)
