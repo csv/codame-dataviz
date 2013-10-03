@@ -146,10 +146,10 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
 }
 
 
-stanza <- function(year) {
+stanza <- function(contracts, gdp, population, year) {
   s <- list(intro = phrase(contracts, gdp, population, year = year, play.melody = FALSE))
   for (region in unique(contracts$Region)) {
-    s[[region]] r- phrase(contracts, gdp, population, year = year, region = 'SOUTH ASIA', play.melody = FALSE),
+    s[[region]] <- phrase(contracts, gdp, population, year = year, region = 'SOUTH ASIA', play.melody = FALSE)
   }
   s$out = phrase(contracts, gdp, population, year = year, play.melody = TRUE)
   s
@@ -159,16 +159,19 @@ stanza <- function(year) {
 # Intro stanza
 song <- list()
 song$intro <- list()
-song$intro$intro <- phrase(contracts, gdp, population, play.melody = FALSE),
+song$intro$intro <- phrase(contracts, gdp, population, play.melody = FALSE)
 for (region in unique(contracts$Region)) {
   song$intro[[region]] <- phrase(contracts, gdp, population, region = region, play.melody = FALSE)
 }
 song$intro$out <- phrase(contracts, gdp, population, play.melody = TRUE)
 
+for (year in 2000:2013) {
+  song[[as.character(year)]] <- stanza(contracts, gdp, population, year)
+}
 
 # Outro stanza
 song$out <- list()
-song$out$intro <- phrase(contracts, gdp, population, play.melody = TRUE),
+song$out$intro <- phrase(contracts, gdp, population, play.melody = TRUE)
 for (region in unique(contracts$Region)) {
   song$out[[region]] <- phrase(contracts, gdp, population, region = region, play.melody = TRUE)
 }
