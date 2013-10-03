@@ -149,7 +149,7 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
 stanza <- function(contracts, gdp, population, year, ...) {
   s <- list(intro = phrase(contracts, gdp, population, year = year, play.melody = FALSE, ...))
   for (region in unique(contracts$Region)) {
-    s[[region]] <- phrase(contracts, gdp, population, year = year, region = 'SOUTH ASIA', play.melody = FALSE, ...)
+    s[[region]] <- phrase(contracts, gdp, population, year = year, region = 'SOUTH ASIA', play.melody = TRUE, ...)
   }
   s$out = phrase(contracts, gdp, population, year = year, play.melody = TRUE, ...)
   s
