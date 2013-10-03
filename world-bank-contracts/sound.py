@@ -10,7 +10,7 @@ def fraction_to_midi(fraction):
         An integer for midi
     '''
     # Bad implementation for now for scaffolding
-    return int(10 * math.log(1000 * fraction))
+    return max(5, 20 + int(10 * math.log(1000 * fraction)))
 
 def add_phrase(beat, midi_track, time, phrase):
     total_melody = sum([v for k,v in phrase.items() if k in set('01234567')])
@@ -67,8 +67,9 @@ region_keys = [
   u'SOUTH ASIA',
   u'out',
 ]
-for stanza_key in ['intro']: # + map(str, range(2000, 2014)) + ['out']:
+for stanza_key in ['intro'] + map(str, range(2000, 2014)) + ['out']:
     for region_key in region_keys:
+        print stanza_key, region_key
         midi_track, t = add_phrase(beat, midi_track, t, song[stanza_key][region_key])
 
 binfile = open('bank.mid', 'wb')
