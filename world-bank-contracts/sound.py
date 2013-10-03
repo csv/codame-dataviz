@@ -36,23 +36,24 @@ def fraction_to_midi(fraction):
     return round(10 * math.log(1000 * fraction))
 
 def add_phrase(beat, midi_track, time, phrase):
-    for instrument in phrase:
+    total_melody = sum([v for k,v in phrase.items() if k in set('01234567')])
+    for instrument,value in phrase.items():
         if instrument.startswith('drone'):
             midi_track.addNote(
                 track=0,
                 channel=0,
-                pitch=key,
-                duration=beat,
-                volume=100,
+                pitch=fraction_to_midi(value),
+                duration=8,
+                volume=30,
                 time=time
             )
-        elif instrument in set('01234567'):
+        elif instrument in set('01234567'): # Melody
             midi_track.addNote(
                 track=0,
                 channel=0,
-                pitch=key,
-                duration=beat,
-                volume=100,
+                pitch=30 + round(12 * value/total_melody),
+                duration=1,
+                volume=round(25 * math.sqrt(total_melody)),
                 time=time
             )
     return midi_track, (time + beat)
