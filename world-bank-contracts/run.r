@@ -79,11 +79,11 @@ eda <- function() {
 
 
   mauritania <- subset(contracts, Year == 2011 & Borrower.Country == 'Mauritania')
-  ddply(mauritania[c('Project.ID','Total.Contract.Amount..USD.')], 'Project.ID', function(df) { c( Project.Cost = sum(df$Total.Contract.Amount..USD.)) })
+  ddply(mauritania[c('Project.ID','Total.Contract.Amount..USD.')], 'Project.ID', function(df) { c( Project.Cost = mean(df$Total.Contract.Amount..USD.)) })
 }
 
 # Two measures, eight beats
-phrase <- function(contracts, gdp, population, year = NULL, region = NULL, country = NULL, play.melody = TRUE) {
+phrase <- function(contracts, gdp, population, year = NULL, region = NULL, country = NULL, play.melody = TRUE, max.eighthly.contracts = 1) {
   if (!is.null(year)) {
     contracts <- subset(contracts, Year == year)
     gdp <- subset(gdp, Year == year)
@@ -98,15 +98,15 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
 
   if (is.null(country) & is.null(region)) {
     # All the countries that year
-    this.gdp <- sum(gdp$GDP)
-    this.population <- sum(population$Population)
+    this.gdp <- mean(gdp$GDP)
+    this.population <- mean(population$Population)
     drones <- list(
       drone1 = this.gdp,
       drone2 = this.population
     )
 
     melody <- dlply(contracts, 'Region', function(df) {
-      table(df$Year.Eighth)
+      colMeans(table(df$Country, df$Year.Eighth)) / max.eighthly.contracts
     })
 
 
@@ -118,8 +118,8 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
     contracts <- subset(contracts, Borrower.Country == country)
 
     is.domestic <- contracts$Borrower.Country == contracts$Supplier.Country
-    domestic.contracts <- table(contracts[is.domestic,'Year.Eighth'])
-    foreign.contracts <- table(contracts[!is.domestic,'Year.Eighth'])
+    domestic.contracts <- table(contracts[is.domestic,'Year.Eighth']) / max.eighthly.contracts
+    foreign.contracts <- table(contracts[!is.domestic,'Year.Eighth']) / max.eighthly.contracts
 
     drones <- list(
       drone1 = this.gdp,
@@ -134,7 +134,7 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
 
   # Scale each drone to an eight-beat-long note.
   if (play.melody) {
-    projects <- ddply(contracts[c('Project.Name','Total.Contract.Amount..USD.')], 'Project.Name', function(df) { c( Project.Cost = sum(df$Total.Contract.Amount..USD.)) })
+    projects <- ddply(contracts[c('Project.Name','Total.Contract.Amount..USD.')], 'Project.Name', function(df) { c( Project.Cost = mean(df$Total.Contract.Amount..USD.)) })
 
     # The most expensive project in that country that year
     c(drones, melody, list(
@@ -145,32 +145,46 @@ phrase <- function(contracts, gdp, population, year = NULL, region = NULL, count
   }
 }
 
-# Song: 16 Stanzas
-song <- list(
-  # Stanza: 8 Phrases
-  intro = list(
-    # Phrase: 2 measures (8 beats)
-    intro      = phrase(contracts, gdp, population, play.melody = FALSE),
-    africa     = phrase(contracts, gdp, population, region = 'AFRICA', play.melody = FALSE),
-    south.asia = phrase(contracts, gdp, population, region = 'SOUTH ASIA', play.melody = FALSE),
-    out        = phrase(contracts, gdp, population, play.melody = TRUE)
-  ),
-  y2003 = list(
-    intro      = phrase(contracts, gdp, population, 2003, play.melody = FALSE),
-    africa     = phrase(contracts, gdp, population, 2003, region = 'AFRICA', country = 'Sierra Leone', play.melody = TRUE),
-    south.asia = phrase(contracts, gdp, population, 2003, region = 'SOUTH ASIA', country = 'Bangladesh'),
-    out        = phrase(contracts, gdp, population, 2003, play.melody = TRUE)
-  ),
-  y2004 = list(
-    intro      = phrase(contracts, gdp, population, 2004, play.melody = FALSE),
-    africa     = phrase(contracts, gdp, population, 2004, region = 'AFRICA', play.melody = TRUE),
-    south.asia = phrase(contracts, gdp, population, 2004, region = 'SOUTH ASIA', play.melody = TRUE),
-    out        = phrase(contracts, gdp, population, 2004, play.melody = TRUE)
-  ),
-  out = list(
-    intro      = phrase(contracts, gdp, population, play.melody = TRUE),
-    africa     = phrase(contracts, gdp, population, region = 'AFRICA', play.melody = TRUE),
-    south.asia = phrase(contracts, gdp, population, region = 'SOUTH ASIA', play.melody = TRUE),
-    out        = phrase(contracts, gdp, population, play.melody = TRUE)
-  )
-)
+
+stanza <- function(contracts, gdp, population, year, ...) {
+  s <- list(intro = phrase(contracts, gdp, population, year = year, play.melody = FALSE, ...))
+  for (region in unique(contracts$Region)) {
+    s[[region]] <- phrase(contracts, gdp, population, year = year, region = 'SOUTH ASIA', play.melody = FALSE, ...)
+  }
+  s$out = phrase(contracts, gdp, population, year = year, play.melody = TRUE, ...)
+  s
+}
+
+# Scale things
+gdp.scaled <- gdp
+gdp.scaled$GDP <- gdp$GDP / max(gdp$GDP)
+
+population.scaled <- population
+population.scaled$Population <- population$Population / max(population$Population)
+
+max.eighthly.contracts <- max(table(contracts$Year, contracts$Region, contracts$Year.Eighth))
+
+# Intro stanza
+song <- list()
+song$intro <- list()
+song$intro$intro <- phrase(contracts, gdp.scaled, population.scaled, play.melody = FALSE, max.eighthly.contracts = max.eighthly.contracts)
+for (region in unique(contracts$Region)) {
+  song$intro[[region]] <- phrase(contracts, gdp.scaled, population.scaled, region = region, play.melody = FALSE, max.eighthly.contracts = max.eighthly.contracts)
+}
+song$intro$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
+
+# Year stanzas
+for (year in 2000:2013) {
+  song[[as.character(year)]] <- stanza(contracts, gdp.scaled, population.scaled, year, max.eighthly.contracts = max.eighthly.contracts)
+}
+
+# Outro stanza
+song$out <- list()
+song$out$intro <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
+for (region in unique(contracts$Region)) {
+  song$out[[region]] <- phrase(contracts, gdp.scaled, population.scaled, region = region, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
+}
+song$out$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
+
+# Write to file
+cat(toJSON(song),file="song.json",sep="\n")
