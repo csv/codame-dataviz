@@ -212,4 +212,11 @@ for (region in unique(contracts$Region)) {
 video$out$out <- phrase(contracts, gdp, population, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
 
 # Write to file
-cat(toJSON(video),file="video.json",sep="\n")
+# cat(toJSON(video),file="video.json",sep="\n")
+
+# .phrase is a phrase list
+# .beat is a number from 0:7
+plot.frame <- function(.phrase, .beat) {
+  .phrase$melody1
+  .phrase$melody2
+}

@@ -24,8 +24,7 @@ def fraction_to_midi(fraction):
     # Bad implementation for now for scaffolding
     return max(5, 20 + int(10 * math.log(1000 * fraction)))
 
-def add_phrase(beat, midi, time, phrase, melody_track):
-    total_melody = sum([v for k,v in phrase.items() if k in set('01234567')])
+def add_phrase(beat, midi, time, phrase):
     for instrument,value in phrase.items():
         if instrument.startswith('drone'):
             if value not in {'NA', 'NaN'}:
@@ -37,15 +36,30 @@ def add_phrase(beat, midi, time, phrase, melody_track):
                     volume=30,
                     time=time
                 )
-        elif instrument in set('01234567'): # Melody
-            midi.addNote(
-                track=2 + melody_track,
-                channel=0,
-                pitch=30 + int(12 * value/total_melody),
-                duration=1,
-                volume=int(25 * math.sqrt(total_melody)),
-                time=time + int(instrument) * beat
-            )
+
+        elif instrument.startswith('melody'): # Melody
+            total_melody = sum([v for k,v in phrase[instrument].items() if k in set('01234567')])
+            for note in '01234567':
+                midi.addNote(
+                    track=2 + int(instrument[-1]),
+                    channel=0,
+                    pitch=30 + int(12 * value[note]/total_melody),
+                    duration=1,
+                    volume=70,
+                    time=time + int(note) * beat
+                )
+
+        elif instrument in region_keys[1:-1]: # Outro melody
+            total_melody = sum([v for k,v in phrase[instrument].items() if k in set('01234567')])
+            for note in '01234567':
+                midi.addNote(
+                    track=4 + region_keys_dict[instrument],
+                    channel=0,
+                    pitch=30 + int(12 * value[note]/total_melody),
+                    duration=1,
+                    volume=int(25 * math.sqrt(total_melody)),
+                    time=time + int(note) * beat
+                )
     return midi, (time + 8 * beat)
 
 def str_count_parse(count):
@@ -63,8 +77,8 @@ def bpm_time(bpm=120, count=0.25):
 song = json.load(open('song.json'))
 
 bpm = 240
-midi = MIDIFile(10)
-for i in range(10):
+midi = MIDIFile(12)
+for i in range(12):
     midi.addTempo(track=i, time=0,tempo=bpm)
 
 beat = bpm_time(bpm, count='1/4')
@@ -72,8 +86,7 @@ t = 0
 
 for stanza_key in ['intro'] + map(str, range(2000, 2014)) + ['out']:
     for region_key in region_keys:
-        midi, t = add_phrase(beat, midi, t, song[stanza_key][region_key],
-            melody_track = region_keys_dict[region_key])
+        midi, t = add_phrase(beat, midi, t, song[stanza_key][region_key])
 
 binfile = open('bank.mid', 'wb')
 midi.writeFile(binfile)
