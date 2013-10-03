@@ -161,9 +161,7 @@ gdp.scaled$GDP <- scale(gdp$GDP)
 population.scaled <- population
 population.scaled$Population <- scale(population$Population)
 
-# http://stackoverflow.com/questions/14153092/meaning-of-ddply-error-names-attribute-9-must-be-the-same-length-as-the-vec
-.columns <- c('Year', 'Country', 'Year.Eighth')
-max.eighthly.contracts <- max(ddply(contracts[columns], .columns, nrow))
+max.eighthly.contracts <- max(table(contracts$Year, contracts$Region, contracts$Year.Eighth))
 
 # Intro stanza
 song <- list()
