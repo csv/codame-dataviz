@@ -174,3 +174,6 @@ song <- list(
     out        = phrase(contracts, gdp, population, play.melody = TRUE)
   )
 )
+
+
+cat(toJSON(song),file="song.json",sep="\n")
