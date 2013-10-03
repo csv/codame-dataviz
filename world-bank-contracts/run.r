@@ -155,6 +155,7 @@ stanza <- function(contracts, gdp, population, year, ...) {
   s
 }
 
+# Scale things
 gdp.scaled <- gdp
 gdp.scaled$GDP <- gdp$GDP / max(gdp$GDP)
 
@@ -172,6 +173,7 @@ for (region in unique(contracts$Region)) {
 }
 song$intro$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
 
+# Year stanzas
 for (year in 2000:2013) {
   song[[as.character(year)]] <- stanza(contracts, gdp.scaled, population.scaled, year, max.eighthly.contracts = max.eighthly.contracts)
 }
@@ -184,4 +186,5 @@ for (region in unique(contracts$Region)) {
 }
 song$out$out <- phrase(contracts, gdp.scaled, population.scaled, play.melody = TRUE, max.eighthly.contracts = max.eighthly.contracts)
 
+# Write to file
 cat(toJSON(song),file="song.json",sep="\n")
