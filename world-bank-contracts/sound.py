@@ -32,9 +32,9 @@ def add_phrase(beat, midi_track, time, phrase):
                 pitch=30 + int(12 * value/total_melody),
                 duration=1,
                 volume=int(25 * math.sqrt(total_melody)),
-                time=time
+                time=time + int(instrument) * beat
             )
-    return midi_track, (time + beat)
+    return midi_track, (time + 8 * beat)
 
 def str_count_parse(count):
   if isinstance(count, basestring):
@@ -69,7 +69,7 @@ region_keys = [
 ]
 for stanza_key in ['intro'] + map(str, range(2000, 2014)) + ['out']:
     for region_key in region_keys:
-        print stanza_key, region_key
+        # print stanza_key, region_key
         midi_track, t = add_phrase(beat, midi_track, t, song[stanza_key][region_key])
 
 binfile = open('bank.mid', 'wb')
