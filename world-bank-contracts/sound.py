@@ -1,3 +1,4 @@
+import math
 from midiutil.MidiFile import MIDIFile
 
 bpm = 120
@@ -22,6 +23,17 @@ for d in date_range:
                 time=t
             )
     t += beat
+
+def fraction_to_midi(fraction):
+    '''
+    Args:
+        fraction: A number between zero and one
+    Returns:
+        An integer for midi
+    '''
+
+    # Bad implementation for now for scaffolding
+    return round(10 * math.log(1000 * fraction))
 
 def add_phrase(beat, midi_track, time, phrase):
     for instrument in phrase:
